@@ -7,9 +7,6 @@ function About() {
   return <h2>О нас</h2>;
 }
 
-function Register() {
-  return <h2>Список пользователей</h2>;
-}
 
 function App() {
   return (
