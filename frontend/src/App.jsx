@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
+import Register from "./components/Register"
 import "./index.css"
 
 function About() {
@@ -15,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/auth/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );
