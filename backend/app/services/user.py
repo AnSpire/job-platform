@@ -3,6 +3,12 @@ from app.repositories.user import UserRepository
 from app.dto.User import UserCreate
 from app.core.security import hash_password
 from app.models.User import User
+from logging import getLogger
+
+
+user_logger = getLogger(__name__)
+
+
 class UserService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo=user_repo
@@ -17,8 +23,8 @@ class UserService:
             last_name=user_data.last_name,
             role="student"
         )
-        await self.user_repo.create_user(user)
-
+        response = await self.user_repo.create_user(user)
+        return response
 
     async def list_users(self):
         ...

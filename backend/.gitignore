@@ -6,3 +6,4 @@
 checklater/
 **/__init__.py
 .vscode/
+.env

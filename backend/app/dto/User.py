@@ -9,7 +9,7 @@ class UserCreate(BaseModel):
     role: Annotated[str, StringConstraints(pattern="^(student|employer|admin)$")]
 
 class UserRead(BaseModel):
-    id: str
+    id: int
     email: EmailStr
     first_name: str
     last_name: str
@@ -17,3 +17,11 @@ class UserRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserInDB(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    role: str
+    password_hash: str
