@@ -1,5 +1,5 @@
 from typing import Annotated
-from pydantic import BaseModel, EmailStr, StringConstraints
+from pydantic import BaseModel, EmailStr, StringConstraints, ConfigDict
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -20,8 +20,11 @@ class UserRead(BaseModel):
 
 
 class UserInDB(BaseModel):
+    id: int
     email: str
     first_name: str
     last_name: str
     role: str
     password_hash: str
+
+    model_config = ConfigDict(from_attributes=True)

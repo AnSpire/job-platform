@@ -13,3 +13,5 @@ async def get_users(service: UserService = Depends(get_user_service)):
 @user_router.post("/register")
 async def create_user(user: UserCreate, service: UserService = Depends(get_user_service)):
     return await service.create_user(user)
+
+

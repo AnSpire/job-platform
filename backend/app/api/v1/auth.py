@@ -5,8 +5,8 @@ from app.dependencies.dependencies import get_auth_service
 auth_router = APIRouter()
 
 
-auth_router.post("/login")
-async def login(payload: LoginRequest, response_model=TokenPair, auth_service: AuthService = get_auth_service()):
+@auth_router.post("/login")
+async def login(payload: LoginRequest, response_model=TokenPair, auth_service: AuthService = Depends(get_auth_service)):
     return await auth_service.login_user(payload=payload)
 
     
