@@ -33,18 +33,47 @@ function RegistrationForm() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setSubmitted(false);
-    } else {
-      setErrors({});
-      setSubmitted(true);
-      console.log("Регистрация прошла успешно:", formData);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    setSubmitted(false);
+    return;
+  }
+
+  setErrors({});
+
+  // создаём объект без confirmPassword
+  const { confirmPassword, ...dataToSend } = formData;
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/v1/users/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend), // отправляем только name, email, password
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Ошибка регистрации:", errorData);
+      alert("Ошибка при регистрации: " + (errorData.detail || "Неизвестная ошибка"));
+      return;
     }
-  };
+
+    const data = await response.json();
+    console.log("✅ Регистрация прошла успешно:", data);
+    setSubmitted(true);
+  } catch (error) {
+    console.error("Ошибка при соединении с сервером:", error);
+    alert("Не удалось подключиться к серверу.");
+  }
+};
+
+
 
   return (
     <div className="registration-container">

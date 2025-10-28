@@ -1,19 +1,21 @@
 from typing import Annotated
 from pydantic import BaseModel, EmailStr, StringConstraints, ConfigDict
 
+
 class UserCreate(BaseModel):
-    email: EmailStr
-    password: Annotated[str, StringConstraints(min_length=6)]
-    first_name: Annotated[str, StringConstraints(min_length=1, max_length=80)]
-    last_name: Annotated[str, StringConstraints(min_length=1, max_length=80)]
-    role: Annotated[str, StringConstraints(pattern="^(student|employer|admin)$")]
+    email: EmailStr | None = None
+    password: Annotated[str, StringConstraints(min_length=6)] | None = None
+    first_name: Annotated[str, StringConstraints(min_length=1, max_length=80)] | None = None
+    last_name: Annotated[str, StringConstraints(min_length=1, max_length=80)] | None = None
+    role: Annotated[str, StringConstraints(pattern="^(student|employer|admin)$")] | None = None
+
 
 class UserRead(BaseModel):
     id: int
     email: EmailStr
-    first_name: str
-    last_name: str
-    role: str
+    first_name: str | None = None
+    last_name: str | None = None
+    role: str | None = None
 
     class Config:
         from_attributes = True

@@ -3,6 +3,7 @@ from app.repositories.user import UserRepository
 from app.dto.User import UserCreate
 from app.core.security import hash_password
 from app.models.User import User
+from app.dto.User import UserRead
 from logging import getLogger
 
 
@@ -25,6 +26,15 @@ class UserService:
         )
         response = await self.user_repo.create_user(user)
         return response
+    async def get_user_by_id(self, id: int) -> UserRead:
+        user = await self.user_repo.get_user_by_id(id)
+        return user
+
+
+    async def get_user_by_email(self, email: str) -> UserRead:
+        user = await self.user_repo.get_user_by_email(email)
+        return user
+
 
     async def list_users(self):
         ...
