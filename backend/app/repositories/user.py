@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
-from app.dto.User import UserRead, UserInDB
+from app.dto.User import UserRead, UserInDB, UserUpdate
 from app.models.User import User
 from sqlalchemy.exc import IntegrityError
 
@@ -56,7 +56,11 @@ class UserRepository:
 
         return UserInDB.model_validate(user)
 
-    
+    async def get_raw_user_by_id(self, user_id: int) -> User | None:
+        query = select(User).where(User.id == user_id)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+
 
     async def get_user_by_id(self, user_id: int) -> UserRead:
         query = select(User).where(User.id == user_id)
@@ -65,5 +69,25 @@ class UserRepository:
 
         if not user:
             raise HTTPException(status_code=404, detail="user not found")
+
+        return UserRead.model_validate(user)
+
+
+    async def update_user(self, user_id: int, data: UserUpdate) -> UserRead:
+        user = await self.get_raw_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="user not found")
+
+        update_data = data.model_dump(exclude_unset=True)
+
+        for field, value in update_data.items():
+            setattr(user, field, value)
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(user)
+        except IntegrityError:
+            await self.session.rollback()
+            raise HTTPException(status_code=400, detail="email already exists")
 
         return UserRead.model_validate(user)

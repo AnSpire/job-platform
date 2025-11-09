@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Security
 from app.services.user import UserService
-from app.dto.User import UserCreate, UserRead
+from app.dto.User import UserCreate, UserRead, UserUpdate
 from app.dependencies.dependencies import get_user_service
 from app.dependencies.security import get_current_user
 from fastapi.security import HTTPBearer
@@ -46,3 +46,16 @@ async def get_me(current_user: UserRead = Depends(get_current_user)):
     Возвращает данные текущего пользователя.
     """
     return current_user
+
+
+@user_router.patch("/me", response_model=UserRead, tags=["users"])
+async def update_me(
+    update_data: UserUpdate,
+    current_user: UserRead = Depends(get_current_user),
+    service: UserService = Depends(get_user_service)
+):
+    """
+    Обновляет данные текущего пользователя.
+    """
+    updated_user = await service.update_user(current_user.id, update_data)
+    return updated_user

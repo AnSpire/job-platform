@@ -30,3 +30,9 @@ class UserInDB(BaseModel):
     password_hash: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
