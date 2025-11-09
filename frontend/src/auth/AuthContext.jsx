@@ -29,6 +29,12 @@ export function AuthProvider({ children }) {
     setUser(resp.data);
   }
 
+  async function updateProfile(data) {
+    const resp = await api.patch("/users/me", data);
+    setUser(resp.data); // обновили user в state
+  }
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -65,7 +71,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
