@@ -9,7 +9,11 @@ export function AuthProvider({ children }) {
 
   async function silentRefresh() {
     try {
-      const refresh = localStorage.getItem("refresh_token");
+      const raw = localStorage.getItem("refresh_token");
+      if (!raw) return;
+
+      const stored = JSON.parse(raw);   // <--- вот это нужно добавить
+      const refresh = stored.token;
       if (!refresh) return;
 
       const resp = await api.post("/auth/refresh", { refresh_token: refresh });
@@ -17,6 +21,7 @@ export function AuthProvider({ children }) {
       setRefreshToken(resp.data.refresh_token);
     } catch {}
   }
+
 
 
   async function fetchMe() {

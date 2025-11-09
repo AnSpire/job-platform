@@ -16,7 +16,7 @@ export default function Login() {
     setErr(null);
     try {
       await login(email, password);
-      nav(loc.state?.from?.pathname || "/app");
+      nav(loc.state?.from?.pathname || "/");
     } catch (error) {
       setErr(error?.response?.data?.detail || "Ошибка входа");
     }

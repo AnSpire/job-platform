@@ -5,6 +5,8 @@ import Register from "./components/Register"
 import "./index.css"
 import Login from "./pages/Login"
 import { AuthProvider } from "./auth/AuthContext";
+import Protected from "./auth/Protected";
+import UserProfilePage from "./pages/UserProfilePage";
 function About() {
   return <h2>О нас</h2>;
 }
@@ -20,6 +22,14 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
+          <Route
+            path="/app/me"
+            element={
+              <Protected>
+                <UserProfilePage />
+              </Protected>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
