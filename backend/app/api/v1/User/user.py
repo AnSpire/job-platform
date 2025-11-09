@@ -38,3 +38,11 @@ async def create_user(user: UserCreate, service: UserService = Depends(get_user_
 )
 async def private_route(current_user: UserRead = Security(get_current_user)):
     return {"message": f"Hello, {current_user.first_name}!"}
+
+
+@user_router.get("/me", response_model=UserRead, tags=["users"])
+async def get_me(current_user: UserRead = Depends(get_current_user)):
+    """
+    Возвращает данные текущего пользователя.
+    """
+    return current_user

@@ -46,18 +46,16 @@ class UserRepository:
         return UserRead.model_validate(user)
     
 
-    async def get_user_with_password_by_email(self, email: str) -> UserInDB:
-        query = (
-            select(User)
-            .where(User.email == email)
-        )
+    async def get_user_with_password_by_email(self, email: str) -> UserInDB | None:
+        query = select(User).where(User.email == email)
         result = await self.session.execute(query)
         user = result.scalar_one_or_none()
 
         if not user:
-            raise HTTPException(status_code=404, detail="user not found")
+            return None
 
         return UserInDB.model_validate(user)
+
     
 
     async def get_user_by_id(self, user_id: int) -> UserRead:

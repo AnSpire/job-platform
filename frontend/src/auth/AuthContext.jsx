@@ -9,11 +9,15 @@ export function AuthProvider({ children }) {
 
   async function silentRefresh() {
     try {
-      const resp = await api.post("/auth/refresh");
-      if (resp.data.access) setAccessToken(resp.data.access);
-      if (resp.data.refresh) setRefreshToken(resp.data.refresh);
+      const refresh = localStorage.getItem("refresh_token");
+      if (!refresh) return;
+
+      const resp = await api.post("/auth/refresh", { refresh_token: refresh });
+      setAccessToken(resp.data.access_token);
+      setRefreshToken(resp.data.refresh_token);
     } catch {}
   }
+
 
   async function fetchMe() {
     const resp = await api.get("/users/me");
@@ -33,19 +37,17 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     const resp = await api.post("/auth/login/", { email, password });
-    console.log(resp.data.access_token)
-    if (resp.data.access) {
-        setAccessToken(resp.data.access_token);
+
+    if (resp.data.access_token) {
+      setAccessToken(resp.data.access_token);
     }
-    console.log(resp.data);
-    if (resp.data.refresh){ 
-        setRefreshToken(resp.data.refresh_token);
-        console.log(resp.data.refresh_token);
+    if (resp.data.refresh_token) {
+      setRefreshToken(resp.data.refresh_token);
     }
 
-    if (resp.data.user) setUser(resp.data.user);
-    else await fetchMe();
+    await fetchMe();
   }
+
 
   async function logout() {
     try {
