@@ -79,7 +79,7 @@ class UserRepository:
             raise HTTPException(status_code=404, detail="user not found")
 
         update_data = data.model_dump(exclude_unset=True)
-
+        
         for field, value in update_data.items():
             setattr(user, field, value)
 
