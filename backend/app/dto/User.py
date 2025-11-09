@@ -1,6 +1,6 @@
 from typing import Annotated
 from pydantic import BaseModel, EmailStr, StringConstraints, ConfigDict
-
+from typing import Optional
 
 class UserCreate(BaseModel):
     email: EmailStr | None = None
@@ -24,8 +24,8 @@ class UserRead(BaseModel):
 class UserInDB(BaseModel):
     id: int
     email: str
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None 
+    last_name: Optional[str] = None
     role: str
     password_hash: str
 
