@@ -20,8 +20,8 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="profile-wrapper">
-      <div className="profile-card">
+    <div className="profile-wrapper content">
+      <div className="">
 
         <div className="profile-avatar">
           {user.first_name?.[0]?.toUpperCase() ?? user.email[0].toUpperCase()}
@@ -34,7 +34,8 @@ export default function UserProfilePage() {
             </h2>
             <p className="profile-email">{user.email}</p>
             <p className="profile-role">Роль: {user.role}</p>
-
+            <p className="profile-first_name">Имя: {user.first_name}</p>
+            <p className="profile-last_name">Фамилия: {user.last_name}</p>
             <button className="profile-edit" onClick={() => setEditing(true)}>
               Изменить данные
             </button>

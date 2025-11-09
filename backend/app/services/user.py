@@ -48,9 +48,9 @@ class UserService:
             raise HTTPException(status_code=404, detail="User not found")
 
         update_data: dict[str: Any] = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(user, key, value)
+        # for key, value in update_data.items():
+        #     setattr(user, key, value)
 
-        await self.user_repo.update_user(user)
+        await self.user_repo.update_user(user.id, update_data)
         return user
     

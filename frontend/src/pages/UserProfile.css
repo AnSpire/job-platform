@@ -1,7 +1,7 @@
 .profile-wrapper {
   display: flex;
-  justify-content: center;
-  padding-top: 80px;
+  justify-content: left;
+  padding-top: 20px;
 }
 
 .profile-card {

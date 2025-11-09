@@ -78,9 +78,9 @@ class UserRepository:
         if not user:
             raise HTTPException(status_code=404, detail="user not found")
 
-        update_data = data.model_dump(exclude_unset=True)
+        # update_data = data.model_dump(exclude_unset=True)
         
-        for field, value in update_data.items():
+        for field, value in data.items():
             setattr(user, field, value)
 
         try:
