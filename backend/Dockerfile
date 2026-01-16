@@ -5,9 +5,14 @@ WORKDIR /app
 
 RUN pip install uv
 
-COPY pyproject.toml uv.lock ./
+# Для сборки psycopg2 из исходников
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+     build-essential \
+     libpq-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-# uv создаст /app/.venv
+COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen
 
 # ---- 2. Финальный образ ----
@@ -15,17 +20,20 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Копируем окружение из builder
+# Runtime зависимости для psycopg2: libpq.so.5 даёт пакет libpq5
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+     libpq5 \
+     ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/.venv /app/.venv
 
-# Добавляем виртуальное окружение в PATH
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Копируем весь проект
 COPY . .
 
 EXPOSE 8000
-
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
