@@ -16,7 +16,7 @@ const Header = () => {
           {/* Если пользователь не авторизован → показываем Регистрация / Войти */}
           {!user && (
             <>
-              <Link to="/auth/register">Регистрация</Link>
+              {/* <Link to="/auth/register">Регистрация</Link> */}
               <Link to="/auth/login">Войти</Link>
             </>
           )}

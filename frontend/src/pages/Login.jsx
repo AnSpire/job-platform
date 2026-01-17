@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 export default function Login() {
   const { login } = useAuth();
@@ -64,6 +64,11 @@ export default function Login() {
             </button>
           </form>
         </div>
+        <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: 14 }}>
+          <Link to="/auth/register">
+            Впервые на сайте? {/* сюда можно добавить ссылку на логин */}
+          </Link>
+        </p>
       </div>
     </div>
   );

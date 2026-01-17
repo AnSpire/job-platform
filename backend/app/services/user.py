@@ -17,12 +17,13 @@ class UserService:
 
     async def create_user(self, user_data: UserCreate):
         password_hash = hash_password(user_data.password)
+        # role = "student" if user_data.role is None else user_data.role
         user = User(
             email=user_data.email,
             password_hash=password_hash,
             first_name=user_data.first_name,
             last_name=user_data.last_name,
-            role="student"
+            role="student" if user_data.role is None else user_data.role
         )
         response = await self.user_repo.create_user(user)
         return response

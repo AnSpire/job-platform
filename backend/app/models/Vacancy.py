@@ -25,13 +25,11 @@ class Vacancy(DCBase):
     employment_type: Mapped[str] = mapped_column(String(30), nullable=True)
 
     employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id", ondelete="CASCADE"), nullable=False)
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now(), nullable=False)
 
     employer: Mapped[Employer] = relationship("Employer", back_populates="vacancies")
-    company: Mapped[Company] = relationship("Company", back_populates="vacancies")
 
     __table_args__ = (
         CheckConstraint("salary_from >= 0 AND salary_to >= 0", name="check_salary_positive"),
