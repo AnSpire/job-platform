@@ -24,3 +24,6 @@ class User(DCBase):
     __table_args__ = (
         CheckConstraint("role IN ('student', 'employer', 'admin')", name="check_role"),
     )
+
+    def __str__(self) -> str:
+        return f"User(id={self.id}, first_name={self.first_name}, email={self.email}, role={self.role})"

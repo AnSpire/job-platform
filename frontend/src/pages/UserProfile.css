@@ -1,17 +1,15 @@
 .profile-wrapper {
-  display: flex;
-  justify-content: left;
+  /* display: flex;
+  justify-content: left; */
   padding-top: 20px;
 }
 
 .profile-card {
-  background: white;
-  border-radius: 14px;
-  padding: 32px 40px;
+  /* background: white;
+  border-radius: 14px; */
+  padding:32px 40px;
+  padding-left: 0;
   width: 340px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
-  text-align: center;
-  animation: fadeIn 0.3s ease;
 }
 
 .profile-avatar {
@@ -24,17 +22,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin-bottom: 20px;
 }
 
 .profile-name {
   font-size: 22px;
   font-weight: 600;
   margin: 6px 0;
+  min-height: 20px;
 }
 
 .profile-email {
-  font-size: 14px;
+  font-size: 20px;
   color: #6b7280;
   margin-bottom: 30px;
 }

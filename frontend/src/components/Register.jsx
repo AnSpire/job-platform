@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
-import "./Register.css";
+// import "./Register.css";
 
 function RegistrationForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -23,7 +23,7 @@ function RegistrationForm() {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Введите имя";
+    if (!formData.first_name.trim()) newErrors.name = "Введите имя";
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
       newErrors.email = "Некорректный email";
     if (formData.password.length < 6)
@@ -48,6 +48,7 @@ function RegistrationForm() {
     setSubmitted(false);
 
     const { confirmPassword, ...dataToSend } = formData;
+    console.log(formData)
 
     try {
       const response = await fetch(
@@ -100,12 +101,12 @@ function RegistrationForm() {
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
+                    id="first_name"
+                    name="first_name"
                     className={`form-control ${
                       errors.name ? "is-invalid" : ""
                     }`}
-                    value={formData.name}
+                    value={formData.first_name}
                     onChange={handleChange}
                   />
                   {errors.name && (

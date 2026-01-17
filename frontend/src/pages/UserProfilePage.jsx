@@ -21,7 +21,8 @@ export default function UserProfilePage() {
 
   return (
     <div className="profile-wrapper content">
-      <div className="">
+      <h1>Личный кабинет работодателя</h1>
+      <div className="profile-card">
 
         <div className="profile-avatar">
           {user.first_name?.[0]?.toUpperCase() ?? user.email[0].toUpperCase()}
@@ -36,7 +37,7 @@ export default function UserProfilePage() {
             <p className="profile-role">Роль: {user.role}</p>
             <p className="profile-first_name">Имя: {user.first_name}</p>
             <p className="profile-last_name">Фамилия: {user.last_name}</p>
-            <button className="profile-edit" onClick={() => setEditing(true)}>
+            <button className="profile-edit me-2" onClick={() => setEditing(true)}>
               Изменить данные
             </button>
             <button className="profile-logout" onClick={logout}>

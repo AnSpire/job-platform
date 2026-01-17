@@ -19,6 +19,7 @@ class UserRepository:
             last_name=user.last_name,
             role=user.role,
         )
+        print("\n\nNEW USER: " + str(new_user) + "\n\n")
 
 
         self.session.add(new_user)

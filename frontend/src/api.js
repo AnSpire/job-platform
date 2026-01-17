@@ -79,7 +79,7 @@ async function refreshAccess() {
   const r = readFromStorage(REFRESH_KEY);
   let resp;
   if (r && r.token) {
-    resp = await axios.post("http://localhost:8000/api/v1/auth/refresh", { refresh: r.token }, { withCredentials: true });
+    resp = await axios.post("http://localhost:8000/api/v1/auth/refresh", { refresh_token: r.token }, { withCredentials: true });
   } else {
     resp = await axios.post("http://localhost:8000/api/v1/auth/refresh", null, { withCredentials: true });
   }
