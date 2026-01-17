@@ -14,25 +14,25 @@ function About() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Header/>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route
-            path="/app/me"
-            element={
-              <Protected>
-                <UserProfilePage />
-              </Protected>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+      <Header/>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/auth/register" element={<Register />} />
+        <Route path="/auth/login" element={<Login />} />
+        <Route
+          path="/app/me"
+          element={
+            <Protected>
+              <UserProfilePage />
+            </Protected>
+          }
+        />
+      </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

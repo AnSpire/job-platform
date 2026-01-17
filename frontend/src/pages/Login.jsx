@@ -16,18 +16,55 @@ export default function Login() {
     setErr(null);
     try {
       await login(email, password);
-      nav(loc.state?.from?.pathname || "/");
+      nav(loc.state?.from?.pathname || "/app/me");
     } catch (error) {
       setErr(error?.response?.data?.detail || "Ошибка входа");
     }
   }
 
   return (
-    <form onSubmit={handle}>
-      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-      <input value={password} type="password" onChange={(e) => setPassword(e.target.value)} placeholder="Пароль" />
-      {err && <div style={{ color: "red" }}>{err}</div>}
-      <button>Войти</button>
-    </form>
+    <div className="container vh-100 d-flex align-items-center justify-content-center">
+      <div className="card shadow-sm" style={{ width: "100%", maxWidth: 420 }}>
+        <div className="card-body">
+          <h3 className="card-title text-center mb-4">Вход</h3>
+
+          <form onSubmit={handle}>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                className="form-control"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@mail.com"
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Пароль</label>
+              <input
+                className="form-control"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            {err && (
+              <div className="alert alert-danger py-2">
+                {err}
+              </div>
+            )}
+
+            <button className="btn btn-primary w-100" type="submit">
+              Войти
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

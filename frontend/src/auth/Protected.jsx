@@ -7,7 +7,7 @@ export default function Protected({ children, role }) {
   const location = useLocation();
 
   if (loading) return <div>Загрузка...</div>;
-  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!user) return <Navigate to="/auth/login"/>;
   if (role && user.role !== role) return <Navigate to="/forbidden" replace />;
 
   return <>{children}</>;

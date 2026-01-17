@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api, { setAccessToken, setRefreshToken } from "../api";
+import { useNavigate } from "react-router-dom";
+
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const nav = useNavigate();
 
   async function silentRefresh() {
     try {
@@ -60,14 +64,16 @@ export function AuthProvider({ children }) {
   }
 
 
-  async function logout() {
-    try {
+  async function logout() { try {
       await api.post("/auth/logout");
     } catch {}
-
+    nav("/", {replace: true});
     setAccessToken(null);
     setRefreshToken(null);
     setUser(null);
+    console.log("before nav");
+    console.log("after nav");
+
   }
 
   return (
