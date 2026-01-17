@@ -51,6 +51,6 @@ class UserService:
         # for key, value in update_data.items():
         #     setattr(user, key, value)
 
-        await self.user_repo.update_user(user.id, update_data)
-        return user
+        return await self.user_repo.update_user(user.id, update_data)
+
     

@@ -58,4 +58,5 @@ async def update_me(
     Обновляет данные текущего пользователя.
     """
     updated_user = await service.update_user(current_user.id, update_data)
+    print(updated_user)
     return updated_user

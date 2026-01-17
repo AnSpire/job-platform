@@ -11,7 +11,12 @@ logging.basicConfig(
 )
 
 app = FastAPI()
-base_router = APIRouter(prefix="/api/v1", tags=["base"])
+
+base_prefix = "/api/v1"
+
+app.include_router(user_router, prefix= base_prefix + "/users", tags=["users"])
+app.include_router(auth_router, prefix= base_prefix + "/auth", tags=["auth"])
+# base_router = APIRouter(prefix="/api/v1", tags=["base"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # фронтенд (Vite)
@@ -29,7 +34,5 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-base_router.include_router(user_router, prefix="/users", tags=["users"])
-base_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 
-app.include_router(base_router)
+# app.include_router(base_router)
