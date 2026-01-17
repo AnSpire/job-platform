@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import "./Register.css";
 
 function RegistrationForm() {
@@ -12,6 +13,7 @@ function RegistrationForm() {
 
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const nav = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -73,6 +75,7 @@ function RegistrationForm() {
       const data = await response.json();
       console.log("✅ Регистрация прошла успешно:", data);
       setSubmitted(true);
+      nav("/auth/login", {replace: true})
     } catch (error) {
       console.error("Ошибка при соединении с сервером:", error);
       alert("Не удалось подключиться к серверу.");
