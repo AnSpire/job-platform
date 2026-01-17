@@ -15,7 +15,7 @@ class Employer(DCBase):
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"))
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), nullable=True)
 
     position: Mapped[str] = mapped_column(String(100), nullable=True)  
 

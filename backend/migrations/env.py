@@ -12,6 +12,7 @@ from app.models.Company import Company
 from app.models.Employer import Employer
 from app.models.Resume import Resume
 from app.models.Vacancy import Vacancy
+from app.models.Student import Student
 
 # --------------------------------------------
 # 1. Загружаем переменные окружения
