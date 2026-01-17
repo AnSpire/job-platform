@@ -12,8 +12,8 @@ class User(DCBase):
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     email: Mapped[str] = mapped_column(CITEXT, unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
-    first_name: Mapped[str] = mapped_column(String(80), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(80), nullable=True)
+    first_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(),

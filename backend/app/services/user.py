@@ -1,4 +1,4 @@
-from fastapi.exceptions import HTTPException
+from fastapi import HTTPException, status
 from app.repositories.user import UserRepository
 from app.dto.User import UserCreate, UserUpdate, UserRead
 from app.core.security import hash_password
@@ -16,17 +16,28 @@ class UserService:
 
 
     async def create_user(self, user_data: UserCreate):
+        if user_data.email is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="email is required",
+            )
+        if user_data.password is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="password is required",
+            )
+
         password_hash = hash_password(user_data.password)
-        # role = "student" if user_data.role is None else user_data.role
+
         user = User(
-            email=user_data.email,
+            email=str(user_data.email),
             password_hash=password_hash,
             first_name=user_data.first_name,
             last_name=user_data.last_name,
-            role="student" if user_data.role is None else user_data.role
+            role=user_data.role or "student",
         )
-        response = await self.user_repo.create_user(user)
-        return response
+        return await self.user_repo.create_user(user)
+
     
 
     async def get_user_by_id(self, id: int) -> UserRead:

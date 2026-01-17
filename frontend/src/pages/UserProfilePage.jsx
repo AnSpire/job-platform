@@ -1,5 +1,6 @@
 import { useAuth } from "../auth/AuthContext";
 import EmployerProfile from "../components/EmployerProfile";
+import StudentProfile from "../components/StudentProfile";
 import "./UserProfile.css";
 
 export default function UserProfilePage() {
@@ -18,8 +19,11 @@ export default function UserProfilePage() {
       )}
 
       {user.role === "student" && (
-        <h2>Личный кабинет студента</h2>
-        // позже вынесешь StudentProfile аналогично
+        <StudentProfile
+          user={user}
+          updateProfile={updateProfile}
+          logout={logout}
+        />
       )}
     </div>
   );
