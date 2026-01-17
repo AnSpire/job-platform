@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
 
+    APP_HOST: str = "0.0.0.0"
+    APP_PORT: int = 8000
+    DB_ECHO: bool = False
+
     class Config:
         env_file = ".env"
 

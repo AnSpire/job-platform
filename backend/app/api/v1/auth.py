@@ -13,6 +13,3 @@ async def login(payload: LoginRequest, auth_service: AuthService = Depends(get_a
 @auth_router.post("/refresh")
 async def refresh_tokens(payload: RefreshTokenRequest, service: AuthService = Depends(get_auth_service)):
     return await service.refresh_token(payload.refresh_token)
-
-
-    
