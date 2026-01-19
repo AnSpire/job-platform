@@ -5,7 +5,7 @@ class Base(DeclarativeBase):
 
 class DCBase(MappedAsDataclass, Base):
     __abstract__ = True
-    pass
+
 
 
     

@@ -1,95 +1,113 @@
+from __future__ import annotations
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import HTTPException
-from app.dto.User import UserRead, UserInDB, UserUpdate
-from app.models.User import User
-from app.models.Employer import Employer
 from sqlalchemy.exc import IntegrityError
+
+from app.models.Employer import Employer
+from app.dto.Employer import EmployerCreate, EmployerRead, EmployerUpdate
+from app.repositories.Exceptions import (
+    NotFoundError,
+    ConflictError,
+    ForeignKeyError,
+    ConstraintError,
+)
+
+
+def _classify_integrity_error(e: IntegrityError) -> Exception:
+    """
+    Пытаемся различать причины IntegrityError.
+    Самый надёжный способ — по имени constraint в Postgres (diag.constraint_name).
+    Если БД/драйвер не поддерживает — падаем в общий ConstraintError.
+    """
+    orig = getattr(e, "orig", None)
+
+    constraint = None
+    diag = getattr(orig, "diag", None)
+    if diag is not None:
+        constraint = getattr(diag, "constraint_name", None)
+
+    # Подстрой под реальные имена constraint в твоей БД (их можно посмотреть в миграциях/схеме)
+    # Часто Alembic генерит имена вида: employers_user_id_key, employers_company_id_fkey и т.п.
+    if constraint:
+        c = constraint.lower()
+        if "user_id" in c and ("key" in c or "unique" in c):
+            return ConflictError("employer profile for this user already exists")
+        if "fkey" in c or "foreign" in c:
+            return ForeignKeyError("invalid references (foreign key constraint)")
+        return ConstraintError(f"constraint violation: {constraint}")
+
+    # Фоллбек: иногда можно понять по тексту (не идеально и зависит от БД)
+    msg = str(orig).lower() if orig else str(e).lower()
+    if "unique" in msg or "duplicate" in msg:
+        return ConflictError("unique constraint violation")
+    if "foreign key" in msg:
+        return ForeignKeyError("foreign key constraint violation")
+    return ConstraintError("integrity constraint violation")
 
 
 class EmployerRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-
-    async def create_employer(self, user: Employer) -> UserRead:
-        new_user = User(
-            email=user.email,
-            password_hash=user.password_hash,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            role=user.role,
+    async def create(self, data: EmployerCreate) -> Employer:
+        employer = Employer(
+            user_id=data.user_id,
+            company_id=data.company_id,
+            position=data.position,
         )
-        print("\n\nNEW USER: " + str(new_user) + "\n\n")
+        self.session.add(employer)
 
-
-        self.session.add(new_user)
         try:
-            await self.session.commit()
-            await self.session.refresh(new_user)
-        except IntegrityError:
-            await self.session.rollback()
-            raise HTTPException(status_code=400, detail="email already exists")
+            await self.session.flush()
+        except IntegrityError as e:
+            raise _classify_integrity_error(e) from e
 
-        return UserRead.model_validate(new_user)
-    
+        return employer
 
-    async def get_user_by_email(self, email: str) -> UserRead:
-        query = (
-            select(User)
-            .where(User.email == email)
-        )
-        result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
-
-        if not user:
-            raise HTTPException(status_code=404, detail="user not found")
-
-        return UserRead.model_validate(user)
-    
-
-    async def get_user_with_password_by_email(self, email: str) -> UserInDB | None:
-        query = select(User).where(User.email == email)
-        result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
-
-        if not user:
-            return None
-
-        return UserInDB.model_validate(user)
-
-    async def get_raw_user_by_id(self, user_id: int) -> User | None:
-        query = select(User).where(User.id == user_id)
-        result = await self.session.execute(query)
+    async def get_raw_by_id(self, employer_id: int) -> Employer | None:
+        result = await self.session.execute(select(Employer).where(Employer.id == employer_id))
         return result.scalar_one_or_none()
 
+    async def get_by_id(self, employer_id: int) -> Employer:
+        employer = await self.get_raw_by_id(employer_id)
+        if not employer:
+            raise NotFoundError("employer not found")
+        return employer
 
-    async def get_user_by_id(self, user_id: int) -> UserRead:
-        query = select(User).where(User.id == user_id)
-        result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
+    async def get_raw_by_user_id(self, user_id: int) -> Employer | None:
+        result = await self.session.execute(select(Employer).where(Employer.user_id == user_id))
+        return result.scalar_one_or_none()
 
-        if not user:
-            raise HTTPException(status_code=404, detail="user not found")
+    async def get_by_user_id(self, user_id: int) -> Employer:
+        employer = await self.get_raw_by_user_id(user_id)
+        if not employer:
+            raise NotFoundError("employer not found")
+        return employer
 
-        return UserRead.model_validate(user)
+    # ---------- update ----------
+    async def update(self, employer_id: int, data: EmployerUpdate) -> Employer:
+        employer = await self.get_by_id(employer_id)
 
-
-    async def update_user(self, user_id: int, data: UserUpdate) -> UserRead:
-        user = await self.get_raw_user_by_id(user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="user not found")
-
-        # update_data = data.model_dump(exclude_unset=True)
-        
-        for field, value in data.items():
-            setattr(user, field, value)
+        update_data = data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(employer, field, value)
 
         try:
-            await self.session.commit()
-            await self.session.refresh(user)
-        except IntegrityError:
-            await self.session.rollback()
-            raise HTTPException(status_code=400, detail="email already exists")
+            await self.session.flush()
+        except IntegrityError as e:
+            raise _classify_integrity_error(e) from e
 
-        return UserRead.model_validate(user)
+        return employer
+
+    # ---------- delete ----------
+    async def delete(self, employer_id: int) -> None:
+        employer = await self.get_by_id(employer_id)
+        await self.session.delete(employer)
+        # flush, чтобы поймать ошибки (редко нужно, но симметрично)
+        await self.session.flush()
+
+    # ---------- helpers ----------
+    @staticmethod
+    def to_read(employer: Employer) -> EmployerRead:
+        return EmployerRead.model_validate(employer)

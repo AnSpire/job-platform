@@ -1,39 +1,78 @@
+# app/models/Vacancy.py
 from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import String, Text, ForeignKey, Integer, CheckConstraint, func
+from typing import Optional, TYPE_CHECKING
+
+from sqlalchemy import CheckConstraint, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.Base import DCBase
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.Employer import Employer
-    from app.models.Company import Company
+    from app.models.Application import Application
 
 
 class Vacancy(DCBase):
     __tablename__ = "vacancies"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
+
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    requirements: Mapped[str] = mapped_column(Text, nullable=True)
-    responsibilities: Mapped[str] = mapped_column(Text, nullable=True)
-    salary_from: Mapped[int] = mapped_column(Integer, nullable=True)
-    salary_to: Mapped[int] = mapped_column(Integer, nullable=True)
-    currency: Mapped[str] = mapped_column(String(10), nullable=True)
-    location: Mapped[str] = mapped_column(String(100), nullable=True)
-    employment_type: Mapped[str] = mapped_column(String(30), nullable=True)
 
-    employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id", ondelete="CASCADE"), nullable=False)
+    requirements: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    responsibilities: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now(), nullable=False)
+    salary_from: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    salary_to: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    currency: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
 
-    employer: Mapped[Employer] = relationship("Employer", back_populates="vacancies")
+    location: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    employment_type: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
 
-    __table_args__ = (
-        CheckConstraint("salary_from >= 0 AND salary_to >= 0", name="check_salary_positive"),
+    # Вариант B: только employer_id, company_id нет
+    employer_id: Mapped[int] = mapped_column(
+        ForeignKey("employers.id", ondelete="CASCADE"),
+        nullable=False,
     )
 
-    def __repr__(self):
-        return f"<Vacancy id={self.id} title={self.title!r} company_id={self.company_id}>"
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        nullable=False,
+        init=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+        init=False,
+    )
+
+    employer: Mapped["Employer"] = relationship(
+        "Employer",
+        back_populates="vacancies",
+        init=False,
+    )
+
+    applications: Mapped[list["Application"]] = relationship(
+        "Application",
+        back_populates="vacancy",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
+    )
+
+    __table_args__ = (
+        # NULL допустим; проверяем только если значение задано
+        CheckConstraint("(salary_from IS NULL OR salary_from >= 0)", name="check_salary_from_positive"),
+        CheckConstraint("(salary_to IS NULL OR salary_to >= 0)", name="check_salary_to_positive"),
+        CheckConstraint(
+            "(salary_from IS NULL OR salary_to IS NULL OR salary_from <= salary_to)",
+            name="check_salary_range",
+        ),
+    )
+
+    def __repr__(self) -> str:
+        return f"<Vacancy id={self.id} title={self.title!r} employer_id={self.employer_id}>"

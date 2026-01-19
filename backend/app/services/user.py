@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
 from app.repositories.user import UserRepository
+from app.services.Employer import EmployerService
+from app.dto.Employer import EmployerCreate
 from app.dto.User import UserCreate, UserUpdate, UserRead
 from app.core.security import hash_password
 from app.models.User import User
 from logging import getLogger
-from typing import Any
-
 
 user_logger = getLogger(__name__)
 
@@ -15,7 +15,7 @@ class UserService:
         self.user_repo=user_repo
 
 
-    async def create_user(self, user_data: UserCreate):
+    async def create_user(self, user_data: UserCreate, employer_service: EmployerService):
         if user_data.email is None:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -29,6 +29,7 @@ class UserService:
 
         password_hash = hash_password(user_data.password)
 
+        
         user = User(
             email=str(user_data.email),
             password_hash=password_hash,
@@ -36,7 +37,16 @@ class UserService:
             last_name=user_data.last_name,
             role=user_data.role or "student",
         )
-        return await self.user_repo.create_user(user)
+        user_in_db = await self.user_repo.create_user(user)
+        if user_data.role == "employer":
+            employer = EmployerCreate(
+                user_id=user_in_db.id
+            )
+            employer_in_db = await employer_service.create_employer(
+                data=employer
+            )
+
+        return user_in_db
 
     
 

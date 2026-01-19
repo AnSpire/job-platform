@@ -3,6 +3,7 @@ from app.services.user import UserService
 from app.dto.User import UserCreate, UserRead, UserUpdate
 from app.dependencies.dependencies import get_user_service
 from app.dependencies.security import get_current_user
+from app.dependencies.employer import get_employer_service
 from fastapi.security import HTTPBearer
 import logging
 
@@ -26,9 +27,8 @@ async def get_users(service: UserService = Depends(get_user_service)):
 
 
 @user_router.post("/register")
-async def create_user(user: UserCreate, service: UserService = Depends(get_user_service)):
-    return await service.create_user(user)
-
+async def create_user(user: UserCreate, service: UserService = Depends(get_user_service), employer_service=Depends(get_employer_service)):
+    return await service.create_user(user, employer_service=employer_service)
 
 @user_router.get(
     "/privateRoute",
