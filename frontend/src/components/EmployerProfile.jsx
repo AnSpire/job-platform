@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import "./EmployerProfile.css";
 import "./Vacancy.css";
+import CreateVacancy from "./CreateVacancy";
 
 
 export default function EmployerProfile({ user, updateProfile, logout }) {
@@ -169,142 +170,14 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           </div>
         </div>
       </div>
-
-      {showVacancyModal && (
-        <div className="modal-overlay" onMouseDown={closeVacancyModal}>
-          <div className="modal-window" onMouseDown={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h4 className="m-0">Создать вакансию</h4>
-              <button className="modal-close" onClick={closeVacancyModal} aria-label="close">
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={handleVacancySubmit} className="modal-body">
-              {vacancyError && <div className="alert alert-danger py-2">{vacancyError}</div>}
-
-              <label className="modal-label">
-                Название (title) *
-                <input
-                  className="form-control"
-                  name="title"
-                  value={vacancyForm.title}
-                  onChange={handleVacancyChange}
-                  maxLength={120}
-                />
-              </label>
-
-              <label className="modal-label">
-                Описание (description) *
-                <textarea
-                  className="form-control"
-                  name="description"
-                  value={vacancyForm.description}
-                  onChange={handleVacancyChange}
-                  rows={4}
-                />
-              </label>
-
-              <label className="modal-label">
-                Требования (requirements)
-                <textarea
-                  className="form-control"
-                  name="requirements"
-                  value={vacancyForm.requirements ?? ""}
-                  onChange={handleVacancyChange}
-                  rows={3}
-                />
-              </label>
-
-              <label className="modal-label">
-                Обязанности (responsibilities)
-                <textarea
-                  className="form-control"
-                  name="responsibilities"
-                  value={vacancyForm.responsibilities ?? ""}
-                  onChange={handleVacancyChange}
-                  rows={3}
-                />
-              </label>
-
-              <div className="modal-grid-3">
-                <label className="modal-label">
-                  salary_from
-                  <input
-                    className="form-control"
-                    name="salary_from"
-                    value={vacancyForm.salary_from ?? ""}
-                    onChange={handleVacancyChange}
-                    inputMode="numeric"
-                  />
-                </label>
-
-                <label className="modal-label">
-                  salary_to
-                  <input
-                    className="form-control"
-                    name="salary_to"
-                    value={vacancyForm.salary_to ?? ""}
-                    onChange={handleVacancyChange}
-                    inputMode="numeric"
-                  />
-                </label>
-
-                <label className="modal-label">
-                  currency
-                  <input
-                    className="form-control"
-                    name="currency"
-                    value={vacancyForm.currency ?? ""}
-                    onChange={handleVacancyChange}
-                    placeholder="EUR, USD..."
-                    maxLength={10}
-                  />
-                </label>
-              </div>
-
-              <div className="modal-grid-2">
-                <label className="modal-label">
-                  location
-                  <input
-                    className="form-control"
-                    name="location"
-                    value={vacancyForm.location ?? ""}
-                    onChange={handleVacancyChange}
-                    maxLength={100}
-                  />
-                </label>
-
-                <label className="modal-label">
-                  employment_type
-                  <select
-                    className="form-select"
-                    name="employment_type"
-                    value={vacancyForm.employment_type ?? ""}
-                    onChange={handleVacancyChange}
-                  >
-                    <option value="">(не выбрано)</option>
-                    <option value="full_time">full_time</option>
-                    <option value="part_time">part_time</option>
-                    <option value="internship">internship</option>
-                    <option value="contract">contract</option>
-                    <option value="remote">remote</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-outline-secondary" onClick={closeVacancyModal} disabled={vacancySaving}>
-                  Отмена
-                </button>
-                <button type="submit" className="btn btn-success" disabled={vacancySaving}>
-                  {vacancySaving ? "Сохранение..." : "Создать"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CreateVacancy
+        open={showVacancyModal}
+        onClose={() => setShowVacancyModal(false)}
+        createVacancy={createVacancy}
+        onCreated={() => {
+        }}
+      />
+    
     </div>
   );
 }
