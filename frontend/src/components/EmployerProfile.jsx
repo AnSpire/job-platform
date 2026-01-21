@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import "./EmployerProfile.css";
 import "./Vacancy.css";
 import CreateVacancy from "./CreateVacancy";
+import Modal from "./Modal";
 
 
 export default function EmployerProfile({ user, updateProfile, logout }) {
@@ -170,13 +171,38 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           </div>
         </div>
       </div>
-      <CreateVacancy
+      <Modal
         open={showVacancyModal}
         onClose={() => setShowVacancyModal(false)}
-        createVacancy={createVacancy}
-        onCreated={() => {
-        }}
-      />
+        title="Создать вакансию"
+        disableClose={vacancySaving /* или стейт из родителя, если хочешь */}
+        footer={
+          <>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setShowVacancyModal(false)}
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              form="create-vacancy-form"
+              className="btn btn-success"
+            >
+              Создать
+            </button>
+          </>
+        }
+      >
+        <CreateVacancy
+          open={showVacancyModal}
+          onClose={() => setShowVacancyModal(false)}
+          createVacancy={createVacancy}
+          onCreated={() => {}}
+        />
+      </Modal>
+
     
     </div>
   );
