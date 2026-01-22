@@ -21,8 +21,8 @@ class EmployerService:
     async def create_employer(self, data: EmployerCreate) -> EmployerRead:
         try:
             employer = await self.repo.create(data)
-            await self.session.commit()
-            await self.session.refresh(employer)
+            # await self.session.commit()
+            # await self.session.refresh(employer)
             return self.repo.to_read(employer)
 
         except ConflictError as e:

@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.user import UserRepository
 from app.services.Employer import EmployerService
 from app.dto.Employer import EmployerCreate
@@ -7,12 +8,20 @@ from app.core.security import hash_password
 from app.models.User import User
 from logging import getLogger
 
+from app.repositories.Exceptions import NotFoundError, ConflictError, ConstraintError, ForeignKeyError
+
+
 user_logger = getLogger(__name__)
 
 
 class UserService:
-    def __init__(self, user_repo: UserRepository):
+    def __init__(
+            self,
+            user_repo: UserRepository,
+            session: AsyncSession
+        ):
         self.user_repo=user_repo
+        self.session=session
 
 
     async def create_user(self, user_data: UserCreate, employer_service: EmployerService):
@@ -26,53 +35,75 @@ class UserService:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="password is required",
             )
+        try:
+            password_hash = hash_password(user_data.password)
 
-        password_hash = hash_password(user_data.password)
-
-        
-        user = User(
-            email=str(user_data.email),
-            password_hash=password_hash,
-            first_name=user_data.first_name,
-            last_name=user_data.last_name,
-            role=user_data.role or "student",
-        )
-        user_in_db = await self.user_repo.create_user(user)
-        if user_data.role == "employer":
-            employer = EmployerCreate(
-                user_id=user_in_db.id
-            )
-            employer_in_db = await employer_service.create_employer(
-                data=employer
+            
+            user = User(
+                email=str(user_data.email),
+                password_hash=password_hash,
+                first_name=user_data.first_name,
+                last_name=user_data.last_name,
+                role=user_data.role or "student",
             )
 
-        return user_in_db
+            created_user = await self.user_repo.create_user(user)
 
-    
+            if user_data.role == "employer":
+                employer = EmployerCreate(user_id = created_user.id)
+                await employer_service.create_employer(data = employer)
 
-    async def get_user_by_id(self, id: int) -> UserRead:
-        user = await self.user_repo.get_user_by_id(id)
-        return user
+            await self.session.commit()
+            await self.session.refresh(created_user)
 
+            return UserRead.model_validate(created_user)
+
+        except ConflictError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        except NotFoundError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        except (ForeignKeyError, ConstraintError) as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except Exception:
+            await self.session.rollback()
+            raise
+
+
+    async def get_user_by_id(self, user_id: int) -> UserRead:
+        try:
+            user = await self.user_repo.get_by_id(user_id)  # ORM
+            return UserRead.model_validate(user)
+        except NotFoundError as e:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
     async def get_user_by_email(self, email: str) -> UserRead:
-        user = await self.user_repo.get_user_by_email(email)
-        return user
+        try:
+            user = await self.user_repo.get_by_email(email)  # ORM
+            return UserRead.model_validate(user)
+        except NotFoundError as e:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
+    async def update_user(self, user_id: int, data: UserUpdate) -> UserRead:
+        try:
+            user = await self.user_repo.update_user(user_id, data)  # flush внутри repo
+            await self.session.commit()
+            await self.session.refresh(user)
+            return UserRead.model_validate(user)
 
-    async def list_users(self):
-        ...
-    
-    
-    async def update_user(self, user_id: int, data: UserUpdate):
-        user = await self.user_repo.get_user_by_id(user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        update_data: dict[str: Any] = data.model_dump(exclude_unset=True)
-        # for key, value in update_data.items():
-        #     setattr(user, key, value)
-
-        return await self.user_repo.update_user(user.id, update_data)
+        except NotFoundError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        except ConflictError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        except (ForeignKeyError, ConstraintError) as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except Exception:
+            await self.session.rollback()
+            raise
 
     
