@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.Vacancy import VacancyRepository
 from app.dto.Vacancy import VacancyCreate, VacancyRead, VacancyUpdate
@@ -15,7 +15,7 @@ class VacancyService:
         self.repo = vacancy_repo
 
 
-    async def create(self, vacancy_data: VacancyCreate) -> VacancyRead:
+    async def create(self, vacancy_data: VacancyCreate) -> VacancyRead | None:
         try:
             created_vacancy = await self.repo.create(data=vacancy_data)
 
