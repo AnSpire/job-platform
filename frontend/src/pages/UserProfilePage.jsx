@@ -8,6 +8,10 @@ export default function UserProfilePage() {
 
   if (!user) return null;
 
+  console.log("USER:", user);
+  console.log("ROLE:", JSON.stringify(user.role));
+
+
   return (
     <div className="profile-wrapper content">
       {user.role === "employer" && (
