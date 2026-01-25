@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, Security, HTTPException, status
 from app.services.user import UserService
 from app.dto.User import UserCreate, UserRead, UserUpdate
+from app.dto.Employer import EmployerRead
 from app.dependencies.dependencies import get_user_service
 from app.dependencies.security import get_current_user
 from app.dependencies.employer import get_employer_service
+from app.services.Employer import EmployerService
 from fastapi.security import HTTPBearer
 import logging
 
@@ -41,11 +43,22 @@ async def private_route(current_user: UserRead = Security(get_current_user)):
 
 
 @user_router.get("/me", response_model=UserRead, tags=["users"])
-async def get_me(current_user: UserRead = Depends(get_current_user)):
+async def get_me(current_user: UserRead = Security(get_current_user)):
     """
-    Возвращает данные текущего пользователя.
+    возвращает данные текущего пользователя.
     """
     return current_user
+
+
+@user_router.get("/my_employer_id")
+async def get_employer_id(current_user: UserRead=Security(get_current_user), employer_service: EmployerService  = Depends(get_employer_service)):
+    if current_user.role != "employer":
+        return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your role isn't an employer")
+    user_id = current_user.id
+    employer: EmployerRead = await employer_service.get_by_user_id(user_id)
+    return {"employer_id": employer.id}
+    
+
 
 
 @user_router.patch("/me", response_model=UserRead, tags=["users"])

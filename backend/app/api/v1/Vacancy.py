@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.db import get_async_session
 from app.dependencies.vacancy import *
@@ -8,7 +8,7 @@ from app.services.Vacancy import VacancyService
 vacancy_router = APIRouter()
 
 
-@vacancy_router.post("/", response_model=VacancyRead)
+@vacancy_router.post("/", response_model=VacancyRead, status_code=status.HTTP_201_CREATED)
 async def create_vacancy(payload: VacancyCreate, service: VacancyService = Depends(get_vacancy_service)):
     return await service.create_vacancy(payload)
 

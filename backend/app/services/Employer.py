@@ -37,9 +37,15 @@ class EmployerService:
             await self.session.rollback()
             raise HTTPException(status_code=400, detail=str(e))
 
-    async def get_employer(self, employer_id: int) -> EmployerRead:
+    async def get_by_employer_id(self, employer_id: int) -> EmployerRead:
         try:
             employer = await self.repo.get_by_id(employer_id)
+            return self.repo.to_read(employer)
+        except NotFoundError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+    async def get_by_user_id(self, user_id: int) -> EmployerRead:
+        try:
+            employer = await self.repo.get_by_user_id(user_id)
             return self.repo.to_read(employer)
         except NotFoundError as e:
             raise HTTPException(status_code=404, detail=str(e))

@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Sequence
 
 from fastapi import HTTPException
-
 from app.dto.Vacancy import VacancyCreate, VacancyRead, VacancyUpdate
+from app.models.Vacancy import Vacancy
 from app.repositories.Vacancy import VacancyRepository
 from app.repositories.Exceptions import (
     NotFoundError,
@@ -23,7 +23,7 @@ class VacancyService:
 
     async def create_vacancy(self, data: VacancyCreate) -> VacancyRead:
         try:
-            vacancy = await self.repo.create(data)
+            vacancy: Vacancy = await self.repo.create(data)
             await self.session.commit()
             await self.session.refresh(vacancy)
             # commit/refresh обычно делаем на уровне endpoint/UoW,
