@@ -1,6 +1,8 @@
 from fastapi import FastAPI, APIRouter
 from app.api.v1.User.user import user_router
 from app.api.v1.auth import auth_router
+from app.api.v1.Employer import employer_router
+from app.api.v1.Vacancy import vacancy_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 import logging
@@ -16,6 +18,10 @@ base_prefix = "/api/v1"
 
 app.include_router(user_router, prefix= base_prefix + "/users", tags=["users"])
 app.include_router(auth_router, prefix= base_prefix + "/auth", tags=["auth"])
+app.include_router(employer_router, prefix= base_prefix + "/employer", tags=["employer"])
+app.include_router(vacancy_router, prefix= base_prefix + "/vacancy", tags=["vacancy"])
+
+
 # base_router = APIRouter(prefix="/api/v1", tags=["base"])
 app.add_middleware(
     CORSMiddleware,
