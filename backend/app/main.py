@@ -18,8 +18,8 @@ base_prefix = "/api/v1"
 
 app.include_router(user_router, prefix= base_prefix + "/users", tags=["users"])
 app.include_router(auth_router, prefix= base_prefix + "/auth", tags=["auth"])
-app.include_router(employer_router, prefix= base_prefix + "/employer", tags=["employer"])
-app.include_router(vacancy_router, prefix= base_prefix + "/vacancy", tags=["vacancy"])
+app.include_router(employer_router, prefix= base_prefix + "/employers", tags=["employers"])
+app.include_router(vacancy_router, prefix= base_prefix + "/vacancies", tags=["vacancies"])
 
 
 # base_router = APIRouter(prefix="/api/v1", tags=["base"])
