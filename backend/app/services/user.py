@@ -24,7 +24,7 @@ class UserService:
         self.session=session
 
 
-    async def create_user(self, user_data: UserCreate, employer_service: EmployerService):
+    async def create_user(self, user_data: UserCreate, employer_service: EmployerService) -> UserRead:
         if user_data.email is None:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

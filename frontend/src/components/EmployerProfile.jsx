@@ -74,10 +74,19 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
   async function createVacancy(payload) {
     try {
-      const { data } = await api.get("/users/my_employer_id");
+      // const { data } = await api.get("/users/my_employer_id");
+      const employerId = user?.employer_id;
+
+      if (!employerId) {
+        const error = new Error("Employer ID is missing");
+        error.code = "NO_EMPLOYER_ID";
+        throw error;
+      }
+    
       const payloadWithEmployer = {
         ...payload,
-        employer_id: data.employer_id,
+        employer_id: employerId
+        // employer_id: data.employer_id,
       };
       const { data: created } = await api.post("/vacancies/", payloadWithEmployer);
       return created;

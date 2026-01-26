@@ -16,6 +16,8 @@ class UserRead(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     role: str | None = None
+    employer_id: int | None = None
+    student_id: int | None = None
 
     class Config:
         from_attributes = True
