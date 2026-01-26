@@ -4,6 +4,7 @@ import "./Vacancy.css";
 import Modal from "./Modal";
 import ProfileCard from "./ProfileCard";
 import CreateVacancyForm from "./CreateVacancyForm";
+import {api} from "../api.js"
 
 const EMPTY_VACANCY = {
   title: "",
@@ -72,14 +73,33 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   }
 
   async function createVacancy(payload) {
-    // TODO: подключи свой клиент:
-    // const { data } = await api.post("/api/v1/vacancies", payload);
-    // return data;
-    console.log("CREATE VACANCY payload:", payload);
+    try {
+      const { data } = await api.get("/users/my_employer_id");
+      const payloadWithEmployer = {
+        ...payload,
+        employer_id: data.employer_id,
+      };
+      const { data: created } = await api.post("/vacancies/", payloadWithEmployer);
+      return created;
+    } catch (err) {
+      if (err.response) {
+        // ответ пришёл от бэка (4xx / 5xx)
+        console.error("Create vacancy error:", {
+          status: err.response.status,
+          data: err.response.data,
+        });
+      } else if (err.request) {
+        // запрос ушёл, но ответа нет
+        console.error("Create vacancy: no response from server", err.request);
+      } else {
+        // ошибка до отправки запроса
+        console.error("Create vacancy: request setup error", err.message);
+      }
 
-    // имитируем возврат созданной вакансии:
-    return { id: crypto.randomUUID(), ...payload };
+      throw err; // важно: не глотаем ошибку
+    }
   }
+
 
   async function handleVacancySubmit(e) {
     e.preventDefault();
@@ -87,7 +107,6 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
     const err = validateVacancy(vacancyForm);
 
-    alert("submit")
     if (err) {
       setVacancyError(err);
       return;

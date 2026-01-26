@@ -17,12 +17,14 @@ export function AuthProvider({ children }) {
       if (!raw) return;
 
       const stored = JSON.parse(raw);   // <--- вот это нужно добавить
+      console.log(stored)
       const refresh = stored.token;
       if (!refresh) return;
 
       const resp = await api.post("/auth/refresh", { refresh_token: refresh });
       setAccessToken(resp.data.access_token);
       setRefreshToken(resp.data.refresh_token);
+      console.log(resp.data.refresh_token, localStorage.getItem("myapp_refresh_token"))
     } catch {}
   }
 

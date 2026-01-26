@@ -12,7 +12,7 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 def _exp(minutes: int = 0, days: int = 0) -> datetime:
-    return _now() + timedelta(days=days, minutes=minutes)
+    return _now() + timedelta(days=days, seconds=minutes) # TODO Вернуть minutes
 
 
 def _base_claims(sub: str, ttype: TokenType, extra: Optional[dict]=None) -> dict:

@@ -33,8 +33,8 @@ function readFromStorage(key) {
 (function initFromStorage() {
   const a = readFromStorage(ACCESS_KEY);
   const r = readFromStorage(REFRESH_KEY);
-  accessToken = a ? a.token ?? a : null;
-  refreshToken = r ? r.token ?? r : null;
+  accessToken = a ? (a.token ?? a) : null;
+  refreshToken = r ? (r.token ?? r) : null;
 })();
 
 export function setAccessToken(token, meta = {}) {
@@ -56,7 +56,7 @@ export function clearTokens() {
 }
 
 // API клиент
-const api = axios.create({
+export const api = axios.create({
   baseURL: "http://localhost:8000/api/v1",
   withCredentials: true, // если refresh в cookie — полезно. Для локального refresh в localStorage можно убрать, но оставить не мешает.
 });
@@ -71,22 +71,76 @@ api.interceptors.request.use((config) => {
 });
 
 // Функция обновления — вариант использует /auth/refresh и ожидает JSON с { access, refresh }
+
 async function refreshAccess() {
-  // Если на бэке refresh у вас в cookie -> используйте withCredentials:true и url; 
-  // Если refresh в localStorage — передаём его в теле/headers (по контракту бэка).
-  // Ниже пример, который отправляет refresh в теле, если он у нас в storage,
-  // иначе делает POST без тела (чтобы использовать cookie).
   const r = readFromStorage(REFRESH_KEY);
-  let resp;
-  if (r && r.token) {
-    resp = await axios.post("http://localhost:8000/api/v1/auth/refresh", { refresh_token: r.token }, { withCredentials: true });
-  } else {
-    resp = await axios.post("http://localhost:8000/api/v1/auth/refresh", null, { withCredentials: true });
+
+  try {
+    const url = "http://localhost:8000/api/v1/auth/refresh";
+
+    const resp =
+      r && r.token
+        ? await axios.post(
+            url,
+            { refresh_token: r.token },
+            { withCredentials: true },
+          )
+        : await axios.post(url, null, { withCredentials: true });
+
+    const data = resp.data;
+
+    if (data?.access) setAccessToken(data.access);
+    if (data?.refresh) setRefreshToken(data.refresh);
+
+    return data?.access ?? null;
+  } catch (err) {
+    // axios-ошибка
+    if (axios.isAxiosError(err)) {
+      // Сервер ответил (4xx/5xx)
+      if (err.response) {
+        const status = err.response.status;
+        const payload = err.response.data;
+
+        console.error("[refreshAccess] Server error:", {
+          status,
+          payload,
+          message: err.message,
+        });
+
+        // Пример: если refresh протух/невалиден — чистим токены
+        if (status === 401 || status === 403) {
+          try {
+            setAccessToken(null);
+            setRefreshToken(null);
+            // если нужно ещё и storage почистить:
+            // removeFromStorage(REFRESH_KEY);
+          } catch (_) {}
+        }
+
+        // Вариант 1: вернуть null, чтобы вызывающий понял, что обновление не удалось
+        return null;
+
+        // Вариант 2 (если удобнее): пробросить дальше
+        // throw new Error(`Refresh failed (${status})`);
+      }
+
+      // Запрос ушёл, но ответа нет (CORS/сеть/сервер недоступен)
+      if (err.request) {
+        console.error("[refreshAccess] No response:", {
+          message: err.message,
+        });
+        return null;
+      }
+
+      // Ошибка при настройке запроса
+      console.error("[refreshAccess] Request setup error:", err.message);
+      return null;
+    }
+
+    // Не-axios ошибка
+    console.error("[refreshAccess] Unknown error:", err);
+    return null;
   }
-  const data = resp.data;
-  if (data.access) setAccessToken(data.access);
-  if (data.refresh) setRefreshToken(data.refresh);
-  return data.access;
 }
 
 function processQueue(newAccess) {
@@ -103,7 +157,9 @@ api.interceptors.response.use(
       original._retry = true;
 
       if (isRefreshing) {
-        const newAccess = await new Promise((resolve) => pendingQueue.push(resolve));
+        const newAccess = await new Promise((resolve) =>
+          pendingQueue.push(resolve),
+        );
         if (!newAccess) throw error;
         original.headers.Authorization = `Bearer ${newAccess}`;
         return api(original);
@@ -126,7 +182,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
