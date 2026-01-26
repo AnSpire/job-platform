@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const nav = useNavigate();
-
+  // TODO: без посещения /app/me пользователь не авторизован. 
   async function silentRefresh() {
     try {
       const raw = localStorage.getItem("refresh_token");

@@ -1,4 +1,4 @@
-import "./Vacancy.css";
+import "./CreateVacancy.css";
 
 export default function CreateVacancyForm({ value, onFieldChange }) {
   function onInput(e) {

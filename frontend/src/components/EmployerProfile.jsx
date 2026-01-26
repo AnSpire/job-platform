@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "./EmployerProfile.css";
-import "./Vacancy.css";
+// import "./Vacancy.css";
 import Modal from "./Modal";
 import ProfileCard from "./ProfileCard";
 import CreateVacancyForm from "./CreateVacancyForm";
-import {api} from "../api.js"
+import { api } from "../api.js";
+import { Link } from "react-router";
 
 const EMPTY_VACANCY = {
   title: "",
@@ -27,13 +28,21 @@ function validateVacancy(v) {
   if (!v.title.trim()) return "Поле title (Название) обязательно";
   if (!v.description.trim()) return "Поле description (Описание) обязательно";
 
-  if (v.salary_from != null && Number.isNaN(v.salary_from)) return "salary_from должно быть числом";
-  if (v.salary_to != null && Number.isNaN(v.salary_to)) return "salary_to должно быть числом";
+  if (v.salary_from != null && Number.isNaN(v.salary_from))
+    return "salary_from должно быть числом";
+  if (v.salary_to != null && Number.isNaN(v.salary_to))
+    return "salary_to должно быть числом";
 
-  if (v.salary_from != null && v.salary_from < 0) return "salary_from не может быть отрицательной";
-  if (v.salary_to != null && v.salary_to < 0) return "salary_to не может быть отрицательной";
+  if (v.salary_from != null && v.salary_from < 0)
+    return "salary_from не может быть отрицательной";
+  if (v.salary_to != null && v.salary_to < 0)
+    return "salary_to не может быть отрицательной";
 
-  if (v.salary_from != null && v.salary_to != null && v.salary_from > v.salary_to) {
+  if (
+    v.salary_from != null &&
+    v.salary_to != null &&
+    v.salary_from > v.salary_to
+  ) {
     return "salary_from не может быть больше salary_to";
   }
   return null;
@@ -48,8 +57,58 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
   // (опционально) если будешь хранить список вакансий
   const [vacancies, setVacancies] = useState([]);
+  const [vacanciesLoading, setVacanciesLoading] = useState(false);
+  const [vacanciesLoadError, setVacanciesLoadError] = useState(null);
 
   const modalTitle = useMemo(() => "Создать вакансию", []);
+  useEffect(() => {
+    const employerId = user?.employer_id;
+
+    // пока employer_id нет — ничего не грузим
+    if (!employerId) return;
+
+    let cancelled = false;
+
+    async function loadVacancies() {
+      setVacanciesLoading(true);
+      setVacanciesLoadError(null);
+
+      try {
+        const { data } = await api.get(`/vacancies/employer/${employerId}`);
+
+        // если бэк возвращает не массив, а { items: [...] } — подстрой здесь
+        const list = Array.isArray(data) ? data : (data?.items ?? []);
+
+        if (!cancelled) setVacancies(list);
+      } catch (err) {
+        if (!cancelled) {
+          const msg =
+            err?.response?.data?.detail ||
+            `Не удалось загрузить вакансии (HTTP ${err?.response?.status ?? "?"})`;
+
+          setVacanciesLoadError(msg);
+
+          // опционально: лог
+          if (err.response) {
+            console.error("Load vacancies error:", {
+              status: err.response.status,
+              data: err.response.data,
+            });
+          } else {
+            console.error("Load vacancies error:", err);
+          }
+        }
+      } finally {
+        if (!cancelled) setVacanciesLoading(false);
+      }
+    }
+
+    loadVacancies();
+
+    return () => {
+      cancelled = true; // чтобы не сетать стейт после размонтирования
+    };
+  }, [user?.employer_id]);
 
   function openVacancyModal() {
     setVacancyError(null);
@@ -66,7 +125,10 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
     // salary хотим хранить number|null
     if (name === "salary_from" || name === "salary_to") {
       const v = String(value).trim();
-      setVacancyForm((prev) => ({ ...prev, [name]: v === "" ? null : Number(v) }));
+      setVacancyForm((prev) => ({
+        ...prev,
+        [name]: v === "" ? null : Number(v),
+      }));
       return;
     }
     setVacancyForm((prev) => ({ ...prev, [name]: value }));
@@ -82,13 +144,16 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
         error.code = "NO_EMPLOYER_ID";
         throw error;
       }
-    
+
       const payloadWithEmployer = {
         ...payload,
-        employer_id: employerId
+        employer_id: employerId,
         // employer_id: data.employer_id,
       };
-      const { data: created } = await api.post("/vacancies/", payloadWithEmployer);
+      const { data: created } = await api.post(
+        "/vacancies/",
+        payloadWithEmployer,
+      );
       return created;
     } catch (err) {
       if (err.response) {
@@ -108,7 +173,6 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
       throw err; // важно: не глотаем ошибку
     }
   }
-
 
   async function handleVacancySubmit(e) {
     e.preventDefault();
@@ -130,7 +194,9 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
       setShowVacancyModal(false);
     } catch (error) {
-      setVacancyError(error?.response?.data?.detail || "Не удалось создать вакансию");
+      setVacancyError(
+        error?.response?.data?.detail || "Не удалось создать вакансию",
+      );
     } finally {
       setVacancySaving(false);
     }
@@ -141,7 +207,11 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
       <h2 className="mb-5">Личный кабинет работодателя</h2>
 
       <div className="d-flex">
-        <ProfileCard user={user} updateProfile={updateProfile} logout={logout} />
+        <ProfileCard
+          user={user}
+          updateProfile={updateProfile}
+          logout={logout}
+        />
 
         <div className="vacancies ps-3">
           <div className="top-side d-flex justify-content-between">
@@ -152,19 +222,27 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           </div>
 
           <div className="vacancies-list">
-            {vacancies.length === 0 ? (
-              "Нет активных вакансий"
+            {vacanciesLoading ? (
+              <div className="text-muted">Загрузка вакансий...</div>
+            ) : vacancies.length === 0 ? (
+              <div className="text-muted">Нет активных вакансий</div>
             ) : (
               <ul className="list-group">
                 {vacancies.map((v) => (
-                  <li key={v.id} className="list-group-item">
-                    <div className="fw-semibold">{v.title}</div>
-                    <div className="text-muted small">{v.location || "—"}</div>
+                  <li
+                    key={v.id}
+                    className="list-group-item list-group-item-action"
+                  >
+                    <Link to={`/vacancies/${v.id}`}>
+                      <div className="fw-semibold">{v.title}</div>
+                      <div className="text-muted small">
+                        {v.location || "—"}
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
             )}
-            {/* TODO: get api/v1/my-vacancies */}
           </div>
         </div>
       </div>
@@ -196,10 +274,15 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           </>
         }
       >
-        {vacancyError && <div className="alert alert-danger py-2">{vacancyError}</div>}
+        {vacancyError && (
+          <div className="alert alert-danger py-2">{vacancyError}</div>
+        )}
 
         <form id="create-vacancy-form" onSubmit={handleVacancySubmit}>
-          <CreateVacancyForm value={vacancyForm} onFieldChange={handleVacancyFieldChange} />
+          <CreateVacancyForm
+            value={vacancyForm}
+            onFieldChange={handleVacancyFieldChange}
+          />
         </form>
       </Modal>
     </div>
