@@ -26,3 +26,8 @@ async def update_vacancy(vacancy_id: int, payload: VacancyUpdate, service: Vacan
 @vacancy_router.delete("/{vacancy_id}", status_code=204)
 async def delete_vacancy(vacancy_id: int, service: VacancyService = Depends(get_vacancy_service)):
     await service.delete_vacancy(vacancy_id)
+
+
+@vacancy_router.get("/employer/{employer_id}")
+async def list_vacancies_by_employer(employer_id: int, service: VacancyService = Depends(get_vacancy_service)):
+    return await service.list_vacancies_by_employer(employer_id=employer_id)

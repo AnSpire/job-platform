@@ -53,7 +53,7 @@ async def get_me(current_user: UserRead = Security(get_current_user)):
 @user_router.get("/my_employer_id")
 async def get_employer_id(current_user: UserRead=Security(get_current_user), employer_service: EmployerService  = Depends(get_employer_service)):
     if current_user.role != "employer":
-        return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your role isn't an employer")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your role isn't an employer")
     user_id = current_user.id
     employer: EmployerRead = await employer_service.get_by_user_id(user_id)
     return {"employer_id": employer.id}
