@@ -89,10 +89,14 @@ async function refreshAccess() {
 
     const data = resp.data;
 
-    if (data?.access) setAccessToken(data.access);
-    if (data?.refresh) setRefreshToken(data.refresh);
+    const newAccess = data?.access_token ?? data?.access ?? null;
+    const newRefresh = data?.refresh_token ?? data?.refresh ?? null;
 
-    return data?.access ?? null;
+    if (newAccess) setAccessToken(newAccess);
+    if (newRefresh) setRefreshToken(newRefresh);
+
+    return newAccess;
+
   } catch (err) {
     // axios-ошибка
     if (axios.isAxiosError(err)) {
