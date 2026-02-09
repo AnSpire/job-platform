@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api.js";
+import { useAuth } from "../auth/AuthContext.jsx";
 import "./Vacancy.css";
 
 export default function Vacancy() {
   const { vacancyId } = useParams();
+  const { user } = useAuth();
 
   const [vacancy, setVacancy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,12 +67,25 @@ export default function Vacancy() {
     return form.salary_from !== "" || form.salary_to !== "";
   }, [form.salary_from, form.salary_to]);
 
+  const canEdit = useMemo(() => {
+    if (!user || !vacancy) return false;
+    if (!user.employer_id) return false;
+    return vacancy.employer_id === user.employer_id;
+  }, [user, vacancy]);
+
+  useEffect(() => {
+    if (isEditing && !canEdit) {
+      setIsEditing(false);
+    }
+  }, [isEditing, canEdit]);
+
   function onChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function startEdit() {
+    if (!canEdit) return;
     if (!vacancy) return;
     setForm({
       title: vacancy.title ?? "",
@@ -116,6 +131,7 @@ export default function Vacancy() {
   }
 
   async function save() {
+    if (!canEdit) return;
     setSaving(true);
     setError(null);
 
@@ -188,9 +204,11 @@ export default function Vacancy() {
                 )}
 
                 {!isEditing ? (
-                  <button className="btn btn-outline-primary" onClick={startEdit}>
-                    Редактировать
-                  </button>
+                  canEdit ? (
+                    <button className="btn btn-outline-primary" onClick={startEdit}>
+                      Редактировать
+                    </button>
+                  ) : null
                 ) : (
                   <div className="d-flex gap-2">
                     <button
