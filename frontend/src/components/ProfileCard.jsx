@@ -32,9 +32,9 @@ export default function ProfileCard({
 
           {!editing ? (
             <>
-              <h2 className="profile-name">
+              <h3 className="profile-name">
                 {user.first_name} {user.last_name}
-              </h2>
+              </h3>
 
               <p className="profile-email">{user.email}</p>
               <p className="profile-role">Роль: {user.role}</p>

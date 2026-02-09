@@ -63,7 +63,7 @@ export default function VacanciesList() {
     <div className="container py-5">
       <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
         <div>
-          <h2 className="mb-1">Все вакансии</h2>
+          <h1 className="mb-1">Все вакансии</h1>
           <div className="text-muted small">Найдено: {vacancies.length}</div>
         </div>
       </div>

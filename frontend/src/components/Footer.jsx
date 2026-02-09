@@ -1,6 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-light border-top mt-auto">
       <div className="container py-4">
@@ -8,30 +11,30 @@ const Footer = () => {
 
           {/* Company info */}
           <div className="col-md-4 mb-3">
-            <h5 className="text-uppercase">StartCareer</h5>
+            <h5 className="text-uppercase">{t("footer.companyTitle")}</h5>
             <p className="text-muted small mb-0">
-              Короткое описание компании или слоган.
+              {t("footer.companyDescription")}
             </p>
           </div>
 
           {/* Navigation */}
           <div className="col-md-4 mb-3">
-            <h6 className="text-uppercase">Навигация</h6>
+            <h6 className="text-uppercase">{t("footer.navigationTitle")}</h6>
             <ul className="list-unstyled">
-              <li><a href="/" className="text-decoration-none text-muted">Главная</a></li>
-              <li><a href="/about" className="text-decoration-none text-muted">О компании</a></li>
-              <li><a href="/services" className="text-decoration-none text-muted">Услуги</a></li>
-              <li><a href="/contacts" className="text-decoration-none text-muted">Контакты</a></li>
+              <li><a href="/" className="text-decoration-none text-muted">{t("footer.nav.home")}</a></li>
+              <li><a href="/about" className="text-decoration-none text-muted">{t("footer.nav.about")}</a></li>
+              <li><a href="/services" className="text-decoration-none text-muted">{t("footer.nav.services")}</a></li>
+              <li><a href="/contacts" className="text-decoration-none text-muted">{t("footer.nav.contacts")}</a></li>
             </ul>
           </div>
 
           {/* Contacts */}
           <div className="col-md-4 mb-3">
-            <h6 className="text-uppercase">Контакты</h6>
+            <h6 className="text-uppercase">{t("footer.contactsTitle")}</h6>
             <ul className="list-unstyled text-muted small">
-              <li>Email: info@company.com</li>
-              <li>Телефон: +7 (000) 000-00-00</li>
-              <li>Адрес: Москва</li>
+              <li>{t("footer.contacts.email")}</li>
+              <li>{t("footer.contacts.phone")}</li>
+              <li>{t("footer.contacts.address")}</li>
             </ul>
           </div>
 
@@ -40,7 +43,7 @@ const Footer = () => {
         <hr />
 
         <div className="text-center text-muted small">
-          © {new Date().getFullYear()} StartCareer. Все права защищены.
+          © {new Date().getFullYear()} {t("footer.companyTitle")}. {t("footer.rights")}
         </div>
       </div>
     </footer>

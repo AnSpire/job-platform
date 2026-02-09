@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import logo from "../assets/image.png";
 import "./Header.css";
 
 const Header = () => {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const headerRef = useRef(null);
@@ -14,11 +16,11 @@ const Header = () => {
 
   const navItems = useMemo(
     () => [
-      { to: "/vacancies", label: "Вакансии", primary: true, enabled: true },
-      { to: "/companies", label: "Компании", primary: true, enabled: true }, // TODO: route
-      { to: "/courses", label: "Курсы", primary: true, enabled: true }, // TODO: route
-      { to: "/blog", label: "Блог", primary: true, enabled: true }, // TODO: route
-      { to: "/contact", label: "Контакты", primary: true, enabled: true }, // TODO: route
+      { to: "/vacancies", key: "header.nav.vacancies", primary: true, enabled: true },
+      { to: "/companies", key: "header.nav.companies", primary: true, enabled: true }, // TODO: route
+      { to: "/courses", key: "header.nav.courses", primary: true, enabled: true }, // TODO: route
+      { to: "/blog", key: "header.nav.blog", primary: true, enabled: true }, // TODO: route
+      { to: "/contact", key: "header.nav.contacts", primary: true, enabled: true }, // TODO: route
     ],
     [],
   );
@@ -43,6 +45,10 @@ const Header = () => {
 
   function handleNavClick() {
     closeAllMenus();
+  }
+
+  function handleLanguageChange(e) {
+    i18n.changeLanguage(e.target.value);
   }
 
   useEffect(() => {
@@ -89,7 +95,7 @@ const Header = () => {
           <Link to="/" className="d-inline-flex align-items-center gap-2">
             <img
               src={logo}
-              alt="StartCareer logo"
+              alt={t("header.logoAlt")}
               className="img-fluid"
               style={{ maxHeight: "46px" }}
             />
@@ -97,10 +103,10 @@ const Header = () => {
 
           <nav
             className="d-none d-lg-flex align-items-center gap-3 header-nav"
-            aria-label="Основная навигация"
+            aria-label={t("header.aria.primary")}
           >
             <Link to="/about" className="nav-link px-0" onClick={handleNavClick}>
-              О нас
+              {t("header.nav.about")}
             </Link>
             {primaryItems.map((item) => (
               <Link
@@ -109,7 +115,7 @@ const Header = () => {
                 className="nav-link px-0"
                 onClick={handleNavClick}
               >
-                {item.label}
+                {t(item.key)}
               </Link>
             ))}
 
@@ -123,7 +129,7 @@ const Header = () => {
                   aria-expanded={moreOpen}
                   aria-controls="header-more-menu"
                 >
-                  Еще
+                  {t("header.more")}
                 </button>
                 {moreOpen && (
                   <div
@@ -140,7 +146,7 @@ const Header = () => {
                         onClick={handleNavClick}
                         ref={index === 0 ? moreFirstLinkRef : null}
                       >
-                        {item.label}
+                        {t(item.key)}
                       </Link>
                     ))}
                   </div>
@@ -150,14 +156,25 @@ const Header = () => {
           </nav>
 
           <div className="d-none d-lg-flex align-items-center gap-3">
+            <select
+              className="form-select form-select-sm"
+              value={i18n.language}
+              onChange={handleLanguageChange}
+              aria-label={t("header.lang.aria")}
+              style={{ width: "auto" }}
+            >
+              <option value="ru">RU</option>
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
             {!user && (
               <Link to="/auth/login" className="btn btn-outline-primary">
-                Войти
+                {t("header.login")}
               </Link>
             )}
             {user && (
               <Link to="/app/me" className="btn btn-primary">
-                Профиль
+                {t("header.profile")}
               </Link>
             )}
           </div>
@@ -166,7 +183,7 @@ const Header = () => {
             type="button"
             className="btn btn-outline-secondary d-lg-none header-burger"
             onClick={toggleMobileMenu}
-            aria-label="Открыть меню"
+            aria-label={t("header.aria.openMenu")}
             aria-expanded={menuOpen}
             aria-controls="header-mobile-menu"
           >
@@ -178,14 +195,25 @@ const Header = () => {
           id="header-mobile-menu"
           className={`header-mobile-menu d-lg-none ${menuOpen ? "open" : ""}`}
         >
-          <nav className="d-flex flex-column gap-2" aria-label="Мобильная навигация">
+          <nav className="d-flex flex-column gap-2" aria-label={t("header.aria.mobile")}>
+            <select
+              className="form-select form-select-sm mb-2"
+              value={i18n.language}
+              onChange={handleLanguageChange}
+              aria-label={t("header.lang.aria")}
+              style={{ width: "auto" }}
+            >
+              <option value="ru">RU</option>
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
             <Link
               to="/about"
               className="nav-link"
               onClick={handleNavClick}
               ref={mobileFirstLinkRef}
             >
-              О нас
+              {t("header.nav.about")}
             </Link>
             {navItems
               .filter((item) => item.enabled)
@@ -196,19 +224,19 @@ const Header = () => {
                   className="nav-link"
                   onClick={handleNavClick}
                 >
-                  {item.label}
+                  {t(item.key)}
                 </Link>
               ))}
 
             <div className="border-top pt-3 mt-2">
               {!user && (
                 <Link to="/auth/login" className="btn btn-outline-primary login-button" onClick={handleNavClick}>
-                  Войти
+                  {t("header.login")}
                 </Link>
               )}
               {user && (
                 <Link to="/app/me" className="btn btn-primary w-100" onClick={handleNavClick}>
-                  Профиль
+                  {t("header.profile")}
                 </Link>
               )}
             </div>

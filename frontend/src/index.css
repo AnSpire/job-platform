@@ -21,3 +21,23 @@ a {
     color: inherit;
 
 }
+
+:root {
+  --bs-body-color: #054487; /* твой синий */
+}
+
+h2, h1 {
+  color: #ef6012; /* твой оранжевый */
+}
+h3, h4, h5, h6{
+    color: #054487 !important;
+}
+:root{
+  --bs-body-color: #100D08;
+  --bs-link-color: #100D08;
+  --bs-link-hover-color: #100D08;
+}
+
+.text-body, .text-secondary, .text-muted, .text-dark, .text-black-50 {
+  color: #3f444b !important;
+}
