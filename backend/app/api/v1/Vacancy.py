@@ -8,6 +8,11 @@ from app.services.Vacancy import VacancyService
 vacancy_router = APIRouter()
 
 
+@vacancy_router.get("/", response_model=list[VacancyRead])
+async def list_vacancies(service: VacancyService = Depends(get_vacancy_service)):
+    return await service.list_vacancies()
+
+
 @vacancy_router.post("/", response_model=VacancyRead, status_code=status.HTTP_201_CREATED)
 async def create_vacancy(payload: VacancyCreate, service: VacancyService = Depends(get_vacancy_service)):
     return await service.create_vacancy(payload)

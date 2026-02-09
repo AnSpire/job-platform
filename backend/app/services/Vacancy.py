@@ -63,6 +63,15 @@ class VacancyService:
         )
         return [VacancyRead.model_validate(v) for v in vacancies]
 
+    async def list_vacancies(
+        self,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Sequence[VacancyRead]:
+        vacancies = await self.repo.list_all(limit=limit, offset=offset)
+        return [VacancyRead.model_validate(v) for v in vacancies]
+
     async def update_vacancy(self, vacancy_id: int, data: VacancyUpdate) -> VacancyRead:
         try:
             vacancy = await self.repo.update(vacancy_id, data)

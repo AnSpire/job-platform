@@ -118,6 +118,20 @@ class VacancyRepository:
         )
         return result.scalars().all()
 
+    async def list_all(
+        self,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Sequence[Vacancy]:
+        result = await self.session.execute(
+            select(Vacancy)
+            .order_by(Vacancy.created_at.desc(), Vacancy.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return result.scalars().all()
+
     async def update(self, vacancy_id: int, data: VacancyUpdate) -> Vacancy:
         vacancy = await self.get_raw_by_id(vacancy_id)
         if not vacancy:
