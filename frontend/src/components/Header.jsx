@@ -202,7 +202,7 @@ const Header = () => {
 
             <div className="border-top pt-3 mt-2">
               {!user && (
-                <Link to="/auth/login" className="btn btn-outline-primary w-100" onClick={handleNavClick}>
+                <Link to="/auth/login" className="btn btn-outline-primary login-button" onClick={handleNavClick}>
                   Войти
                 </Link>
               )}

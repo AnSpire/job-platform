@@ -56,8 +56,9 @@
 }
 
 .header-burger-lines::after {
-  top: 6px;
+  top: 5.7px;
 }
+
 
 .header-mobile-menu {
   max-height: 0;
@@ -89,4 +90,9 @@
   .header-mobile-menu {
     display: none;
   }
+}
+
+.login-button{
+  width: 95%;
+  padding-inline: 5px;
 }
