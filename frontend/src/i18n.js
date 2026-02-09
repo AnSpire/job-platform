@@ -44,6 +44,33 @@ const resources = {
         },
         rights: "Все права защищены.",
       },
+       vacancies: {
+        title: "Все вакансии",
+        found: "Найдено: {{count}}",
+        loading: "Загрузка вакансий...",
+        empty: "Пока нет доступных вакансий",
+        open: "Открыть",
+        published: "Опубликовано:",
+        locationPrefix: "📍",
+        locationNotSpecified: "Локация не указана",
+        noDescription: "Описание отсутствует",
+        errors: {
+          loadFailed: "Не удалось загрузить вакансии (HTTP {{status}})"
+        },
+        salary: {
+          notSpecified: "Зарплата не указана",
+          range: "от {{from}} до {{to}} {{currency}}",
+          from: "от {{from}} {{currency}}",
+          to: "до {{to}} {{currency}}"
+        },
+        employment: {
+          full_time: "Полная занятость",
+          part_time: "Частичная занятость",
+          contract: "Контракт",
+          internship: "Стажировка",
+          remote: "Удалённо"
+        }
+      }
     },
   },
   en: {
@@ -88,6 +115,33 @@ const resources = {
         },
         rights: "All rights reserved.",
       },
+       vacancies: {
+        title: "All vacancies",
+        found: "Found: {{count}}",
+        loading: "Loading vacancies...",
+        empty: "No vacancies available yet",
+        open: "Open",
+        published: "Published:",
+        locationPrefix: "📍",
+        locationNotSpecified: "Location not specified",
+        noDescription: "No description",
+        errors: {
+          loadFailed: "Failed to load vacancies (HTTP {{status}})"
+        },
+        salary: {
+          notSpecified: "Salary not specified",
+          range: "from {{from}} to {{to}} {{currency}}",
+          from: "from {{from}} {{currency}}",
+          to: "up to {{to}} {{currency}}"
+        },
+        employment: {
+          full_time: "Full-time",
+          part_time: "Part-time",
+          contract: "Contract",
+          internship: "Internship",
+          remote: "Remote"
+        }
+      }
     },
   },
   es: {
@@ -131,6 +185,33 @@ const resources = {
           address: "Direccion: Moscu",
         },
         rights: "Todos los derechos reservados.",
+      },
+      vacancies: {
+        title: "Todas las vacantes",
+        found: "Encontradas: {{count}}",
+        loading: "Cargando vacantes...",
+        empty: "Aún no hay vacantes disponibles",
+        open: "Abrir",
+        published: "Publicado:",
+        locationPrefix: "📍",
+        locationNotSpecified: "Ubicación no especificada",
+        noDescription: "Sin descripción",
+        errors: {
+          loadFailed: "No se pudieron cargar las vacantes (HTTP {{status}})",
+        },
+        salary: {
+          notSpecified: "Salario no especificado",
+          range: "de {{from}} a {{to}} {{currency}}",
+          from: "desde {{from}} {{currency}}",
+          to: "hasta {{to}} {{currency}}",
+        },
+        employment: {
+          full_time: "Tiempo completo",
+          part_time: "Medio tiempo",
+          contract: "Contrato",
+          internship: "Prácticas",
+          remote: "Remoto",
+        },
       },
     },
   },
