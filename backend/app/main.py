@@ -4,6 +4,11 @@ from app.api.v1.auth import auth_router
 from app.api.v1.Employer import employer_router
 from app.api.v1.Vacancy import vacancy_router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from app.utils.i18n.lang import get_lang
+from app.utils.i18n.translations import t
+from app.utils.i18n.validation_map import translate_validation_error
 from fastapi import Request
 import logging
 
@@ -39,6 +44,30 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     return response
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    lang = get_lang(request)
 
+    errors_out = []
+    for e in exc.errors():
+        # loc: ('body', 'title') -> "body.title"
+        loc = ".".join(str(x) for x in e.get("loc", []) if x is not None)
+        err_type = e.get("type")  # напр. "missing", "string_too_short", ...
+        msg = e.get("msg")        # базовое (обычно EN) сообщение
+
+        errors_out.append({
+            "loc": loc,
+            "type": err_type,
+            "message": translate_validation_error(lang, e),       # можно оставить как есть
+        })
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": t("errors.validation", lang),  # локализованная шапка
+            "errors": errors_out,
+            "lang": lang,
+        },
+    )
 
 # app.include_router(base_router)
