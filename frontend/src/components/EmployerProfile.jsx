@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./EmployerProfile.css";
-// import "./Vacancy.css";
 import Modal from "./Modal";
 import ProfileCard from "./ProfileCard";
 import CreateVacancyForm from "./CreateVacancyForm";
@@ -20,51 +20,74 @@ const EMPTY_VACANCY = {
 };
 
 function getEmptyVacancyForm() {
-  // если захочешь — тут можно добавить значения по умолчанию
   return { ...EMPTY_VACANCY };
 }
 
-function validateVacancy(v) {
-  if (!v.title.trim()) return "Поле title (Название) обязательно";
-  if (!v.description.trim()) return "Поле description (Описание) обязательно";
+function formatApiError(err, t) {
+  const status = err?.response?.status;
+  const data = err?.response?.data;
+
+  // FastAPI / Pydantic v2 validation error: 422 + detail: array
+  if (status === 422 && Array.isArray(data?.detail)) {
+    const lines = data.detail.map((e) => {
+      const field = Array.isArray(e.loc)
+        ? e.loc.filter(Boolean).slice(1).join(".")
+        : "field";
+      // e.msg обычно на английском. Можно заменить на t(...) по e.type/field, если захочешь.
+      return `${field}: ${e.msg}`;
+    });
+    return lines; // вернем массив строк
+  }
+
+  // обычный вариант: detail строкой
+  const detail = data?.detail;
+  if (typeof detail === "string" && detail.trim()) return detail;
+
+  return t("employerProfile.errors.createFailed");
+}
+
+function validateVacancy(v, t) {
+  if (!v.title.trim()) return t("employerProfile.validation.titleRequired");
+  if (!v.description.trim())
+    return t("employerProfile.validation.descriptionRequired");
 
   if (v.salary_from != null && Number.isNaN(v.salary_from))
-    return "salary_from должно быть числом";
+    return t("employerProfile.validation.salaryFromNumber");
   if (v.salary_to != null && Number.isNaN(v.salary_to))
-    return "salary_to должно быть числом";
+    return t("employerProfile.validation.salaryToNumber");
 
   if (v.salary_from != null && v.salary_from < 0)
-    return "salary_from не может быть отрицательной";
+    return t("employerProfile.validation.salaryFromNegative");
   if (v.salary_to != null && v.salary_to < 0)
-    return "salary_to не может быть отрицательной";
+    return t("employerProfile.validation.salaryToNegative");
 
   if (
     v.salary_from != null &&
     v.salary_to != null &&
     v.salary_from > v.salary_to
   ) {
-    return "salary_from не может быть больше salary_to";
+    return t("employerProfile.validation.salaryFromGreaterThanTo");
   }
   return null;
 }
 
 export default function EmployerProfile({ user, updateProfile, logout }) {
+  const { t } = useTranslation();
+
   const [showVacancyModal, setShowVacancyModal] = useState(false);
 
   const [vacancyForm, setVacancyForm] = useState(getEmptyVacancyForm());
   const [vacancyError, setVacancyError] = useState(null);
   const [vacancySaving, setVacancySaving] = useState(false);
 
-  // (опционально) если будешь хранить список вакансий
   const [vacancies, setVacancies] = useState([]);
   const [vacanciesLoading, setVacanciesLoading] = useState(false);
   const [vacanciesLoadError, setVacanciesLoadError] = useState(null);
 
-  const modalTitle = useMemo(() => "Создать вакансию", []);
+  const modalTitle = useMemo(() => t("employerProfile.modal.title"), [t]);
+
   useEffect(() => {
     const employerId = user?.employer_id;
-
-    // пока employer_id нет — ничего не грузим
     if (!employerId) return;
 
     let cancelled = false;
@@ -75,28 +98,17 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
       try {
         const { data } = await api.get(`/vacancies/employer/${employerId}`);
-
-        // если бэк возвращает не массив, а { items: [...] } — подстрой здесь
         const list = Array.isArray(data) ? data : (data?.items ?? []);
-
         if (!cancelled) setVacancies(list);
       } catch (err) {
         if (!cancelled) {
+          const status = err?.response?.status ?? "?";
           const msg =
             err?.response?.data?.detail ||
-            `Не удалось загрузить вакансии (HTTP ${err?.response?.status ?? "?"})`;
+            t("employerProfile.errors.loadFailed", { status });
 
           setVacanciesLoadError(msg);
-
-          // опционально: лог
-          if (err.response) {
-            console.error("Load vacancies error:", {
-              status: err.response.status,
-              data: err.response.data,
-            });
-          } else {
-            console.error("Load vacancies error:", err);
-          }
+          console.error("Load vacancies error:", err);
         }
       } finally {
         if (!cancelled) setVacanciesLoading(false);
@@ -106,9 +118,9 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
     loadVacancies();
 
     return () => {
-      cancelled = true; // чтобы не сетать стейт после размонтирования
+      cancelled = true;
     };
-  }, [user?.employer_id]);
+  }, [user?.employer_id, t]);
 
   function openVacancyModal() {
     setVacancyError(null);
@@ -122,7 +134,6 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   }
 
   function handleVacancyFieldChange(name, value) {
-    // salary хотим хранить number|null
     if (name === "salary_from" || name === "salary_to") {
       const v = String(value).trim();
       setVacancyForm((prev) => ({
@@ -135,51 +146,31 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   }
 
   async function createVacancy(payload) {
-    try {
-      // const { data } = await api.get("/users/my_employer_id");
-      const employerId = user?.employer_id;
+    const employerId = user?.employer_id;
 
-      if (!employerId) {
-        const error = new Error("Employer ID is missing");
-        error.code = "NO_EMPLOYER_ID";
-        throw error;
-      }
-
-      const payloadWithEmployer = {
-        ...payload,
-        employer_id: employerId,
-        // employer_id: data.employer_id,
-      };
-      const { data: created } = await api.post(
-        "/vacancies/",
-        payloadWithEmployer,
-      );
-      return created;
-    } catch (err) {
-      if (err.response) {
-        // ответ пришёл от бэка (4xx / 5xx)
-        console.error("Create vacancy error:", {
-          status: err.response.status,
-          data: err.response.data,
-        });
-      } else if (err.request) {
-        // запрос ушёл, но ответа нет
-        console.error("Create vacancy: no response from server", err.request);
-      } else {
-        // ошибка до отправки запроса
-        console.error("Create vacancy: request setup error", err.message);
-      }
-
-      throw err; // важно: не глотаем ошибку
+    if (!employerId) {
+      const error = new Error(t("employerProfile.errors.employerIdMissing"));
+      error.code = "NO_EMPLOYER_ID";
+      throw error;
     }
+
+    const payloadWithEmployer = {
+      ...payload,
+      employer_id: employerId,
+    };
+
+    const { data: created } = await api.post(
+      "/vacancies/",
+      payloadWithEmployer,
+    );
+    return created;
   }
 
   async function handleVacancySubmit(e) {
     e.preventDefault();
     setVacancyError(null);
 
-    const err = validateVacancy(vacancyForm);
-
+    const err = validateVacancy(vacancyForm, t);
     if (err) {
       setVacancyError(err);
       return;
@@ -188,15 +179,10 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
     setVacancySaving(true);
     try {
       const created = await createVacancy(vacancyForm);
-
-      // если ведёшь список — обнови его сразу
       setVacancies((prev) => [created, ...prev]);
-
       setShowVacancyModal(false);
     } catch (error) {
-      setVacancyError(
-        error?.response?.data?.detail || "Не удалось создать вакансию",
-      );
+      setVacancyError(formatApiError(error, t));
     } finally {
       setVacancySaving(false);
     }
@@ -204,7 +190,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
   return (
     <div className="employer-profile">
-      <h2 className="mb-5">Личный кабинет работодателя</h2>
+      <h2 className="mb-5">{t("employerProfile.title")}</h2>
 
       <div className="d-flex">
         <ProfileCard
@@ -215,17 +201,21 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
         <div className="vacancies ps-3">
           <div className="top-side d-flex justify-content-between">
-            <h3 className="mb-3">Мои вакансии</h3>
+            <h3 className="mb-3">{t("employerProfile.myVacancies")}</h3>
             <button className="btn btn-success" onClick={openVacancyModal}>
-              Создать вакансию
+              {t("employerProfile.createVacancy")}
             </button>
           </div>
 
           <div className="vacancies-list">
             {vacanciesLoading ? (
-              <div className="text-muted">Загрузка вакансий...</div>
+              <div className="text-muted">
+                {t("employerProfile.vacancies.loading")}
+              </div>
             ) : vacancies.length === 0 ? (
-              <div className="text-muted">Нет активных вакансий</div>
+              <div className="text-muted">
+                {t("employerProfile.vacancies.empty")}
+              </div>
             ) : (
               <ul className="list-group">
                 {vacancies.map((v) => (
@@ -236,12 +226,28 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
                     <Link to={`/vacancies/${v.id}`}>
                       <div className="fw-semibold">{v.title}</div>
                       <div className="text-muted small">
-                        {v.location || "—"}
+                        {v.location ||
+                          t("employerProfile.vacancies.locationFallback")}
                       </div>
                     </Link>
                   </li>
                 ))}
               </ul>
+            )}
+
+            {/* если хочешь показывать ошибку загрузки */}
+            {vacancyError && (
+              <div className="alert alert-danger py-2">
+                {Array.isArray(vacancyError) ? (
+                  <ul className="mb-0">
+                    {vacancyError.map((line, idx) => (
+                      <li key={idx}>{line}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  vacancyError
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -260,7 +266,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
               onClick={closeVacancyModal}
               disabled={vacancySaving}
             >
-              Отмена
+              {t("employerProfile.modal.cancel")}
             </button>
 
             <button
@@ -269,7 +275,9 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
               className="btn btn-success"
               disabled={vacancySaving}
             >
-              {vacancySaving ? "Создание..." : "Создать"}
+              {vacancySaving
+                ? t("employerProfile.modal.submitting")
+                : t("employerProfile.modal.submit")}
             </button>
           </>
         }
