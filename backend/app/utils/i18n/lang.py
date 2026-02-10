@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import Literal, Optional
 from fastapi import Request
 
-Lang = Literal["en", "es"]
+Lang = Literal["en", "es", "ru"]
 DEFAULT_LANG: Lang = "en"
-SUPPORTED: set[str] = {"en", "es"}
+SUPPORTED: set[str] = {"en", "es", "ru"}
 
 def _parse_accept_language(value: str | None) -> Optional[str]:
     """
@@ -24,7 +24,7 @@ def get_lang(request: Request) -> Lang:
         return q  # type: ignore[return-value]
 
     # 2) Accept-Language header
-    h = _parse_accept_language(request.headers.get("accept-language"))
+    h = _parse_accept_language(request.headers.get("Accept-language"))
     if h in SUPPORTED:
         return h  # type: ignore[return-value]
 

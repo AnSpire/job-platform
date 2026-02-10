@@ -6,6 +6,7 @@ import ProfileCard from "./ProfileCard";
 import CreateVacancyForm from "./CreateVacancyForm";
 import { api } from "../api.js";
 import { Link } from "react-router";
+import i18n from "../i18n/index.js";
 
 const EMPTY_VACANCY = {
   title: "",
@@ -158,10 +159,15 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
       ...payload,
       employer_id: employerId,
     };
-
+    const lang = i18n.language;
     const { data: created } = await api.post(
       "/vacancies/",
       payloadWithEmployer,
+      {
+        headers: {
+          "Accept-Language": lang,
+        },
+      }
     );
     return created;
   }
@@ -182,6 +188,12 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
       setVacancies((prev) => [created, ...prev]);
       setShowVacancyModal(false);
     } catch (error) {
+      console.error("create vacancy failed:", error);
+
+      // axios обычно кладёт самое важное сюда:
+      console.error("response:", error?.response);
+      console.error("response.data:", error?.response?.data);
+      console.error("status:", error?.response?.status);
       setVacancyError(formatApiError(error, t));
     } finally {
       setVacancySaving(false);
