@@ -1,36 +1,59 @@
 import { useMemo } from "react";
 import "./CreateVacancy.css";
 
-function buildFieldErrors(errorList) {
-  const map = {}; // { currency: "...", location: "...", ... }
+type VacancyFormValue = {
+  title: string;
+  description: string;
+  requirements?: string | null;
+  responsibilities?: string | null;
+  salary_from?: string | number | null;
+  salary_to?: string | number | null;
+  currency?: string | null;
+  location?: string | null;
+  employment_type?: string | null;
+};
+
+type FieldErrorMap = Record<string, string>;
+
+type Props = {
+  value: VacancyFormValue;
+  onFieldChange: (name: keyof VacancyFormValue, value: string) => void;
+  errorList?: unknown; // приходит что угодно, мы проверим внутри
+};
+
+function buildFieldErrors(errorList: unknown): FieldErrorMap {
+  const map: FieldErrorMap = {};
   if (!Array.isArray(errorList)) return map;
 
-  for (const msg of errorList) {
-    if (typeof msg !== "string") continue;
+  for (const item of errorList) {
+    if (typeof item !== "string") continue;
 
-    // вытаскиваем имя поля в одинарных кавычках: 'currency'
-    const m = msg.match(/'([^']+)'/);
+    // ищем имя поля в одинарных кавычках: 'currency'
+    const m = item.match(/'([^']+)'/);
     if (!m) continue;
 
     const field = m[1];
-    // если по полю несколько ошибок — склеим
-    map[field] = map[field] ? `${map[field]}; ${msg}` : msg;
+    map[field] = map[field] ? `${map[field]}; ${item}` : item;
   }
 
   return map;
 }
 
-export default function CreateVacancyForm({ value, onFieldChange, errorList }) {
-  function onInput(e) {
-    const { name, value: v } = e.target;
+export default function CreateVacancyForm({ value, onFieldChange, errorList }: Props) {
+  function onInput(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) {
+    const name = e.target.name as keyof VacancyFormValue;
+    const v = e.target.value;
     onFieldChange(name, v);
   }
 
   const fieldErrors = useMemo(() => buildFieldErrors(errorList), [errorList]);
 
-  const hasErr = (name) => Boolean(fieldErrors[name]);
-  const inputClass = (base, name) => `${base} ${hasErr(name) ? "is-invalid" : ""}`;
-  const errText = (name) => fieldErrors[name];
+  const hasErr = (name: keyof VacancyFormValue) => Boolean(fieldErrors[String(name)]);
+  const errText = (name: keyof VacancyFormValue) => fieldErrors[String(name)];
+  const inputClass = (base: string, name: keyof VacancyFormValue) =>
+    `${base} ${hasErr(name) ? "is-invalid" : ""}`;
 
   return (
     <div className="create-vacancy-form">
@@ -94,7 +117,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }) {
           <input
             className={inputClass("form-control", "salary_from")}
             name="salary_from"
-            value={value.salary_from ?? ""}
+            value={String(value.salary_from ?? "")}
             onChange={onInput}
             inputMode="numeric"
           />
@@ -108,7 +131,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }) {
           <input
             className={inputClass("form-control", "salary_to")}
             name="salary_to"
-            value={value.salary_to ?? ""}
+            value={String(value.salary_to ?? "")}
             onChange={onInput}
             inputMode="numeric"
           />
@@ -163,8 +186,10 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }) {
             <option value="contract">contract</option>
             <option value="remote">remote</option>
           </select>
+
+          {/* для select иногда надо d-block */}
           {hasErr("employment_type") && (
-            <div className="invalid-feedback">{errText("employment_type")}</div>
+            <div className="invalid-feedback d-block">{errText("employment_type")}</div>
           )}
         </label>
       </div>

@@ -178,11 +178,11 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
     e.preventDefault();
     setVacancyError(null);
 
-    const err = validateVacancy(vacancyForm, t);
-    if (err) {
-      setVacancyError(err);
-      return;
-    }
+    // const err = validateVacancy(vacancyForm, t);
+    // if (err) {
+    //   setVacancyError(err);
+    //   return;
+    // }
 
     setVacancySaving(true);
     try {
@@ -250,7 +250,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
             )}
 
             {/* если хочешь показывать ошибку загрузки */}
-            {vacancyError && (
+            {/* {vacancyError && (
               <div className="alert alert-danger py-2">
                 {Array.isArray(vacancyError) ? (
                   <ul className="mb-0">
@@ -262,7 +262,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
                   vacancyError
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -296,9 +296,9 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           </>
         }
       >
-        {vacancyError && (
+        {/* {vacancyError && (
           <div className="alert alert-danger py-2">{vacancyError}</div>
-        )}
+        )} */}
 
         <form id="create-vacancy-form" onSubmit={handleVacancySubmit}>
           <CreateVacancyForm
