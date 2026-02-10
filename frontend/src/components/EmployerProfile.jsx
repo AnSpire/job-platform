@@ -27,16 +27,19 @@ function getEmptyVacancyForm() {
 function formatApiError(err, t) {
   const status = err?.response?.status;
   const data = err?.response?.data;
-
+  
   // FastAPI / Pydantic v2 validation error: 422 + detail: array
-  if (status === 422 && Array.isArray(data?.detail)) {
-    const lines = data.detail.map((e) => {
+  if (status === 422 && Array.isArray(data?.errors)) {
+    const lines = data.errors.map((e) => {
       const field = Array.isArray(e.loc)
         ? e.loc.filter(Boolean).slice(1).join(".")
         : "field";
-      // e.msg обычно на английском. Можно заменить на t(...) по e.type/field, если захочешь.
+      // e.msg обычно на английском. Можно заменить на t(...) по e.type/field, если захочешь.\
+      console.log(`${field}: ${e.msg}`)
       return `${field}: ${e.msg}`;
     });
+    
+    console.log(lines)
     return lines; // вернем массив строк
   }
 
@@ -78,13 +81,12 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   const [showVacancyModal, setShowVacancyModal] = useState(false);
 
   const [vacancyForm, setVacancyForm] = useState(getEmptyVacancyForm());
-  const [vacancyError, setVacancyError] = useState(null);
+  const [vacancyError, setVacancyError] = useState([]);
   const [vacancySaving, setVacancySaving] = useState(false);
 
   const [vacancies, setVacancies] = useState([]);
   const [vacanciesLoading, setVacanciesLoading] = useState(false);
   const [vacanciesLoadError, setVacanciesLoadError] = useState(null);
-
   const modalTitle = useMemo(() => t("employerProfile.modal.title"), [t]);
 
   useEffect(() => {
@@ -302,6 +304,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
           <CreateVacancyForm
             value={vacancyForm}
             onFieldChange={handleVacancyFieldChange}
+            errorList={vacancyError}
           />
         </form>
       </Modal>

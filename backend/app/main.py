@@ -58,7 +58,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         errors_out.append({
             "loc": loc,
             "type": err_type,
-            "message": translate_validation_error(lang, e),       # можно оставить как есть
+            "msg": translate_validation_error(lang, e),       # можно оставить как есть
         })
 
     return JSONResponse(
