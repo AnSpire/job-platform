@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { api } from "../../api.js";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import i18n from "../../i18n";
+import { useTranslation } from "react-i18next";
 import VacancyView from "./VacancyView.jsx";
 import VacancyEditForm from "./VacancyEditForm.jsx";
 import VacancyTranslationForm from "./VacancyTranslationForm";
@@ -89,6 +90,7 @@ function normalizeTranslationPayload(form) {
 }
 
 export default function VacancyPage() {
+  const { i18n } = useTranslation();
   const { vacancyId } = useParams();
   const { user } = useAuth();
 
@@ -105,7 +107,7 @@ export default function VacancyPage() {
     async function fetchVacancy() {
       setLoading(true);
       setError(null);
-
+      // alert("get")
       try {
         const response = await api.get(`/vacancies/${vacancyId}`);
         setVacancy(response.data);
@@ -117,7 +119,7 @@ export default function VacancyPage() {
     }
 
     fetchVacancy();
-  }, [vacancyId]);
+  }, [vacancyId, i18n.language]);
 
   useEffect(() => {
     if (!vacancy || mode !== "view") return;

@@ -33,8 +33,14 @@ async def get_vacancy(
 
 
 @vacancy_router.patch("/{vacancy_id}", response_model=VacancyRead)
-async def update_vacancy(vacancy_id: int, payload: VacancyUpdate, service: VacancyService = Depends(get_vacancy_service)):
-    return await service.update_vacancy(vacancy_id, payload)
+async def update_vacancy(
+    vacancy_id: int,
+    payload: VacancyUpdate,
+    request: Request,
+    service: VacancyService = Depends(get_vacancy_service),
+):
+    lang = get_lang(request)
+    return await service.update_vacancy(vacancy_id, payload, lang=lang)
 
 
 @vacancy_router.delete("/{vacancy_id}", status_code=204)

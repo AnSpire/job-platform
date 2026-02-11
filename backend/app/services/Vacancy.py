@@ -6,8 +6,10 @@ from typing import Sequence
 
 from fastapi import HTTPException
 from app.dto.Vacancy import VacancyCreate, VacancyRead, VacancyUpdate
+from app.dto.VacancyTranslation import VacancyTranslationCreate
 from app.models.Vacancy import Vacancy
 from app.repositories.Vacancy import VacancyRepository
+from app.repositories.VacancyTranslation import VacancyTranslationRepository
 from app.repositories.Exceptions import (
     NotFoundError,
     ConflictError,
@@ -18,8 +20,9 @@ from app.utils.i18n.lang import Lang
 
 
 class VacancyService:
-    def __init__(self, repo: VacancyRepository):
+    def __init__(self, repo: VacancyRepository, translation_repo: VacancyTranslationRepository):
         self.repo = repo
+        self.translation_repo = translation_repo
         self.session = repo.session
 
     async def create_vacancy(self, data: VacancyCreate) -> VacancyRead:
@@ -76,12 +79,50 @@ class VacancyService:
         vacancies = await self.repo.list_all_localized(lang=lang, limit=limit, offset=offset)
         return [VacancyRead.model_validate(v) for v in vacancies]
 
-    async def update_vacancy(self, vacancy_id: int, data: VacancyUpdate) -> VacancyRead:
+    async def update_vacancy(
+        self,
+        vacancy_id: int,
+        data: VacancyUpdate,
+        *,
+        lang: Lang = "ru",
+    ) -> VacancyRead:
+        translated_fields = {"title", "description", "requirements", "responsibilities"}
         try:
-            vacancy = await self.repo.update(vacancy_id, data)
+            update_data = data.model_dump(exclude_unset=True)
+            base_update_data = {k: v for k, v in update_data.items() if k not in translated_fields}
+            translated_update_data = {k: v for k, v in update_data.items() if k in translated_fields}
+
+            vacancy = await self.repo.get_by_id(vacancy_id)
+
+            if base_update_data:
+                vacancy = await self.repo.update(vacancy_id, VacancyUpdate(**base_update_data))
+
+            if lang != "ru" and translated_update_data:
+                if (
+                    translated_update_data.get("title", "__missing__") is None
+                    or translated_update_data.get("description", "__missing__") is None
+                ):
+                    raise ConstraintError("title and description cannot be null for translation")
+
+                translation = await self.translation_repo.get_raw_by_vacancy_and_lang(vacancy_id, lang)
+                source = translation or vacancy
+
+                translation_payload = VacancyTranslationCreate(
+                    title=translated_update_data.get("title", source.title),
+                    description=translated_update_data.get("description", source.description),
+                    requirements=translated_update_data.get("requirements", source.requirements),
+                    responsibilities=translated_update_data.get("responsibilities", source.responsibilities),
+                )
+                await self.translation_repo.upsert(vacancy_id, lang, translation_payload)
+
+            if lang == "ru" and translated_update_data:
+                vacancy = await self.repo.update(vacancy_id, VacancyUpdate(**translated_update_data))
+
             await self.session.commit()
-            await self.session.refresh(vacancy)
-            return VacancyRead.model_validate(vacancy)
+            localized = await self.repo.get_localized_by_id(vacancy_id, lang=lang)
+            if not localized:
+                raise NotFoundError("vacancy not found")
+            return VacancyRead.model_validate(localized)
 
         except NotFoundError as e:
             await self.session.rollback()
