@@ -1,8 +1,6 @@
 import { useState } from "react";
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
 import "../index.css"
-import VacanciesList from "./VacanciesList"
+import VacanciesList from "../components/VacanciesList"
 
 export default function Home() {
   const [count, setCount] = useState(0);

@@ -1,3 +1,214 @@
-.employer-profile .vacancies .top-side {
-    min-width: 500px;
+.employer-profile {
+  display: grid;
+  gap: 20px;
+}
+
+.employer-profile__header {
+  margin-bottom: 4px;
+}
+
+.employer-profile__title {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.employer-profile__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.employer-profile__sidebar {
+  display: grid;
+  gap: 16px;
+}
+
+.employer-company-card {
+  background: #ffffff;
+  border: 1px solid #d6e1f7;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 12px 22px rgba(30, 41, 59, 0.06);
+}
+
+.employer-company-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.employer-company-card__head h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.employer-company-card__head span {
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  color: #0f766e;
+  background: #dcfce7;
+  font-weight: 700;
+}
+
+.employer-company-card__name {
+  margin: 0 0 12px;
+  font-size: 1.12rem;
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.employer-company-card__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.employer-company-card__grid div {
+  display: grid;
+  gap: 3px;
+}
+
+.employer-company-card__grid span {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.employer-company-card__grid strong {
+  color: #0f172a;
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.employer-company-card__about {
+  margin: 14px 0 0;
+  color: #334155;
+  line-height: 1.45;
+  font-size: 0.88rem;
+}
+
+.employer-vacancies-card {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(191, 219, 254, 0.4), transparent 45%),
+    #ffffff;
+  border: 1px solid #d6e1f7;
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(30, 41, 59, 0.06);
+  padding: 18px;
+}
+
+.employer-vacancies-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.employer-vacancies-card__top h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.employer-vacancies-card__top p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.employer-vacancies-card__create-btn {
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #059669, #16a34a);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.employer-vacancies-card__create-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
+
+.employer-vacancies-card__hint {
+  color: #64748b;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.employer-vacancies-card__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.employer-vacancies-card__item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.employer-vacancies-card__link {
+  display: grid;
+  gap: 7px;
+  text-decoration: none;
+  color: inherit;
+  padding: 13px 14px;
+}
+
+.employer-vacancies-card__item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.employer-vacancies-card__item-title {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.employer-vacancies-card__item-type {
+  align-self: start;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.employer-vacancies-card__item-location {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+@media (max-width: 992px) {
+  .employer-profile__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .employer-vacancies-card__top {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  .employer-company-card__grid {
+    grid-template-columns: 1fr;
+  }
 }

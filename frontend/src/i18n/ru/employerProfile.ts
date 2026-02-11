@@ -3,10 +3,34 @@ export default {
   myVacancies: "Мои вакансии",
   createVacancy: "Создать вакансию",
 
+  profile: {
+    role: "Роль",
+    firstName: "Имя",
+    lastName: "Фамилия",
+    emptyValue: "Не указано",
+    edit: "Редактировать",
+    logout: "Выйти",
+    save: "Сохранить",
+    cancel: "Отмена",
+    firstNamePlaceholder: "Введите имя",
+    lastNamePlaceholder: "Введите фамилию",
+  },
+
+  company: {
+    title: "Компания работодателя",
+    hardcodedBadge: "Demo",
+    industry: "Сфера",
+    teamSize: "Размер команды",
+    location: "Локация",
+    website: "Сайт",
+    about: "О компании",
+  },
+
   vacancies: {
     loading: "Загрузка вакансий...",
     empty: "Нет активных вакансий",
     locationFallback: "—",
+    subtitle: "Управляйте публикациями и отслеживайте открытые позиции",
   },
 
   modal: {

@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 import Register from "./components/Register";
 import "./index.css";
 import Login from "./pages/Login";
 import { AuthProvider } from "./auth/AuthContext";
 import Protected from "./auth/Protected";
 import UserProfilePage from "./pages/UserProfilePage";
-import Vacancy from "./components/Vacancy/VacancyPage";
+import Vacancy from "./pages/VacancyPage";
 import Footer from "./components/Footer";
 
 function About() {

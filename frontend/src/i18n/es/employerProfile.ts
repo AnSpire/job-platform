@@ -3,10 +3,34 @@ export default {
   myVacancies: "Mis vacantes",
   createVacancy: "Crear vacante",
 
+  profile: {
+    role: "Rol",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    emptyValue: "No especificado",
+    edit: "Editar",
+    logout: "Cerrar sesión",
+    save: "Guardar",
+    cancel: "Cancelar",
+    firstNamePlaceholder: "Introduce el nombre",
+    lastNamePlaceholder: "Introduce el apellido",
+  },
+
+  company: {
+    title: "Empresa del empleador",
+    hardcodedBadge: "Demo",
+    industry: "Sector",
+    teamSize: "Tamaño del equipo",
+    location: "Ubicación",
+    website: "Sitio web",
+    about: "Sobre la empresa",
+  },
+
   vacancies: {
     loading: "Cargando vacantes...",
     empty: "No hay vacantes activas",
     locationFallback: "—",
+    subtitle: "Gestiona publicaciones y sigue posiciones abiertas",
   },
 
   modal: {

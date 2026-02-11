@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../../api.js";
-import { useAuth } from "../../auth/AuthContext.jsx";
-import i18n from "../../i18n";
+import { api } from "../api.js";
+import { useAuth } from "../auth/AuthContext.jsx";
+import i18n from "../i18n";
 import { useTranslation } from "react-i18next";
-import VacancyView from "./VacancyView.jsx";
-import VacancyEditForm from "./VacancyEditForm.jsx";
-import VacancyTranslationForm from "./VacancyTranslationForm";
-import "./Vacancy.css";
+import VacancyView from "../components/Vacancy/VacancyView";
+import VacancyEditForm from "../components/Vacancy/VacancyEditForm";
+import VacancyTranslationForm from "../components/Vacancy/VacancyTranslationForm";
+import "../components/Vacancy/Vacancy.css";
 
 const EMPTY_FORM = {
   title: "",

@@ -88,6 +88,16 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   const [vacanciesLoading, setVacanciesLoading] = useState(false);
   const [vacanciesLoadError, setVacanciesLoadError] = useState(null);
   const modalTitle = useMemo(() => t("employerProfile.modal.title"), [t]);
+  const companyInfo = {
+    name: "ApexHire",
+    industry: "HR Tech",
+    teamSize: "80-120",
+    website: "https://apexhire.example",
+    city: "Berlin",
+    country: "Germany",
+    about:
+      "Building tools for smarter hiring pipelines and candidate experience.",
+  };
 
   useEffect(() => {
     const employerId = user?.employer_id;
@@ -204,42 +214,95 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
 
   return (
     <div className="employer-profile">
-      <h2 className="mb-5">{t("employerProfile.title")}</h2>
+      <div className="employer-profile__header">
+        <h2 className="employer-profile__title">{t("employerProfile.title")}</h2>
+      </div>
 
-      <div className="d-flex">
-        <ProfileCard
-          user={user}
-          updateProfile={updateProfile}
-          logout={logout}
-        />
+      <div className="employer-profile__layout">
+        <aside className="employer-profile__sidebar">
+          <ProfileCard
+            user={user}
+            updateProfile={updateProfile}
+            logout={logout}
+          />
 
-        <div className="vacancies ps-3">
-          <div className="top-side d-flex justify-content-between">
-            <h3 className="mb-3">{t("employerProfile.myVacancies")}</h3>
-            <button className="btn btn-success" onClick={openVacancyModal}>
+          <section className="employer-company-card">
+            <div className="employer-company-card__head">
+              <h3>{t("employerProfile.company.title")}</h3>
+              <span>{t("employerProfile.company.hardcodedBadge")}</span>
+            </div>
+
+            <p className="employer-company-card__name">{companyInfo.name}</p>
+
+            <div className="employer-company-card__grid">
+              <div>
+                <span>{t("employerProfile.company.industry")}</span>
+                <strong>{companyInfo.industry}</strong>
+              </div>
+              <div>
+                <span>{t("employerProfile.company.teamSize")}</span>
+                <strong>{companyInfo.teamSize}</strong>
+              </div>
+              <div>
+                <span>{t("employerProfile.company.location")}</span>
+                <strong>
+                  {companyInfo.city}, {companyInfo.country}
+                </strong>
+              </div>
+              <div>
+                <span>{t("employerProfile.company.website")}</span>
+                <strong>{companyInfo.website}</strong>
+              </div>
+            </div>
+
+            <p className="employer-company-card__about">
+              {t("employerProfile.company.about")}: {companyInfo.about}
+            </p>
+          </section>
+        </aside>
+
+        <section className="employer-vacancies-card">
+          <div className="employer-vacancies-card__top">
+            <div>
+              <h3>{t("employerProfile.myVacancies")}</h3>
+              <p>{t("employerProfile.vacancies.subtitle")}</p>
+            </div>
+            <button
+              className="employer-vacancies-card__create-btn"
+              onClick={openVacancyModal}
+            >
               {t("employerProfile.createVacancy")}
             </button>
           </div>
 
-          <div className="vacancies-list">
+          <div className="employer-vacancies-card__list-wrap">
             {vacanciesLoading ? (
-              <div className="text-muted">
+              <div className="employer-vacancies-card__hint">
                 {t("employerProfile.vacancies.loading")}
               </div>
             ) : vacancies.length === 0 ? (
-              <div className="text-muted">
+              <div className="employer-vacancies-card__hint">
                 {t("employerProfile.vacancies.empty")}
               </div>
             ) : (
-              <ul className="list-group">
+              <ul className="employer-vacancies-card__list">
                 {vacancies.map((v) => (
-                  <li
-                    key={v.id}
-                    className="list-group-item list-group-item-action"
-                  >
-                    <Link to={`/vacancies/${v.id}`}>
-                      <div className="fw-semibold">{v.title}</div>
-                      <div className="text-muted small">
+                  <li key={v.id} className="employer-vacancies-card__item">
+                    <Link
+                      to={`/vacancies/${v.id}`}
+                      className="employer-vacancies-card__link"
+                    >
+                      <div className="employer-vacancies-card__item-top">
+                        <div className="employer-vacancies-card__item-title">
+                          {v.title}
+                        </div>
+                        {v.employment_type && (
+                          <span className="employer-vacancies-card__item-type">
+                            {v.employment_type}
+                          </span>
+                        )}
+                      </div>
+                      <div className="employer-vacancies-card__item-location">
                         {v.location ||
                           t("employerProfile.vacancies.locationFallback")}
                       </div>
@@ -249,22 +312,13 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
               </ul>
             )}
 
-            {/* если хочешь показывать ошибку загрузки */}
-            {/* {vacancyError && (
-              <div className="alert alert-danger py-2">
-                {Array.isArray(vacancyError) ? (
-                  <ul className="mb-0">
-                    {vacancyError.map((line, idx) => (
-                      <li key={idx}>{line}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  vacancyError
-                )}
+            {vacanciesLoadError && (
+              <div className="alert alert-danger py-2 mt-3" role="alert">
+                {vacanciesLoadError}
               </div>
-            )} */}
+            )}
           </div>
-        </div>
+        </section>
       </div>
 
       <Modal

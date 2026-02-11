@@ -1,0 +1,147 @@
+.employer-user-card {
+  background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+  border: 1px solid #dbe4ff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.employer-user-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.employer-user-card__avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.employer-user-card__headline {
+  min-width: 0;
+}
+
+.employer-user-card__name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.employer-user-card__email {
+  margin: 2px 0 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.employer-user-card__role-chip {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.employer-user-card__meta {
+  border-top: 1px solid #dbe4ff;
+  border-bottom: 1px solid #dbe4ff;
+  padding: 12px 0;
+  display: grid;
+  gap: 10px;
+}
+
+.employer-user-card__meta-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.employer-user-card__meta-label {
+  color: #475569;
+  font-size: 0.86rem;
+}
+
+.employer-user-card__meta-value {
+  color: #0f172a;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.employer-user-card__actions {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.employer-user-card__btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.employer-user-card__btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.employer-user-card__btn--primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.employer-user-card__btn--danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.employer-user-card__btn--success {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.employer-user-card__btn--secondary {
+  background: #94a3b8;
+  color: #ffffff;
+}
+
+.employer-user-card__editor {
+  margin-top: 4px;
+}
+
+.employer-user-card__field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.employer-user-card__input {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+.employer-user-card__input:focus {
+  outline: 2px solid #93c5fd;
+  border-color: #60a5fa;
+}
