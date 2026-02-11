@@ -3,7 +3,7 @@ from typing import Literal, Optional
 from fastapi import Request
 
 Lang = Literal["en", "es", "ru"]
-DEFAULT_LANG: Lang = "en"
+DEFAULT_LANG: Lang = "ru"
 SUPPORTED: set[str] = {"en", "es", "ru"}
 
 def _parse_accept_language(value: str | None) -> Optional[str]:

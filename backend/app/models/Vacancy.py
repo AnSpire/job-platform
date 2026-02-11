@@ -12,6 +12,7 @@ from app.models.Base import DCBase
 if TYPE_CHECKING:
     from app.models.Employer import Employer
     from app.models.Application import Application
+    from app.models.VacancyTranslation import VacancyTranslation
 
 
 class Vacancy(DCBase):
@@ -63,6 +64,17 @@ class Vacancy(DCBase):
         init=False,
         passive_deletes=True,
     )
+
+
+    # внутри Vacancy:
+    translations: Mapped[list["VacancyTranslation"]] = relationship(
+        "VacancyTranslation",
+        back_populates="vacancy",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
+    )
+
 
     __table_args__ = (
         # NULL допустим; проверяем только если значение задано

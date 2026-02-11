@@ -13,6 +13,7 @@ from app.models.Employer import Employer
 from app.models.Resume import Resume
 from app.models.Vacancy import Vacancy
 from app.models.Student import Student
+from app.models.VacancyTranslation import VacancyTranslation
 
 # --------------------------------------------
 # 1. Загружаем переменные окружения
@@ -21,7 +22,7 @@ load_dotenv()
 
 DB_USER = os.getenv("POSTGRES_USER", "")
 DB_PASS = os.getenv("POSTGRES_PASSWORD", "")
-DB_HOST = os.getenv("POSTGRES_HOST", "")
+DB_HOST = os.getenv("ALEMBIC_HOST", "")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "")
 

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int
+    ALEMBIC_HOST: str
 
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
