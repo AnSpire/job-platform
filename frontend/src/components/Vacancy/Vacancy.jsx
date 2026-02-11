@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../api.js";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { api } from "../../api.js";
+import { useAuth } from "../../auth/AuthContext.jsx";
 import "./Vacancy.css";
 
 export default function Vacancy() {
@@ -67,17 +67,17 @@ export default function Vacancy() {
     return form.salary_from !== "" || form.salary_to !== "";
   }, [form.salary_from, form.salary_to]);
 
-  const canEdit = useMemo(() => {
+  const isOwner = useMemo(() => {
     if (!user || !vacancy) return false;
     if (!user.employer_id) return false;
     return vacancy.employer_id === user.employer_id;
   }, [user, vacancy]);
 
   useEffect(() => {
-    if (isEditing && !canEdit) {
+    if (isEditing && !isOwner) {
       setIsEditing(false);
     }
-  }, [isEditing, canEdit]);
+  }, [isEditing, isOwner]);
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -85,7 +85,7 @@ export default function Vacancy() {
   }
 
   function startEdit() {
-    if (!canEdit) return;
+    if (!isOwner) return;
     if (!vacancy) return;
     setForm({
       title: vacancy.title ?? "",
@@ -130,8 +130,14 @@ export default function Vacancy() {
     };
   }
 
+  function handleTranslate(){
+      
+  }
+
+
+
   async function save() {
-    if (!canEdit) return;
+    if (!isOwner) return;
     setSaving(true);
     setError(null);
 
@@ -204,7 +210,7 @@ export default function Vacancy() {
                 )}
 
                 {!isEditing ? (
-                  canEdit ? (
+                  isOwner ? (
                     <button className="btn btn-outline-primary" onClick={startEdit}>
                       Редактировать
                     </button>
@@ -227,6 +233,10 @@ export default function Vacancy() {
                     </button>
                   </div>
                 )}
+                {isOwner ? (
+                    <button className="btn btn-secondary" onClick={handleTranslate}> Добавить перевод</button>
+                ) :
+                 null}
               </div>
 
               {error && (
