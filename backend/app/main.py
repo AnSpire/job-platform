@@ -2,7 +2,8 @@ from fastapi import FastAPI, APIRouter
 from app.api.v1.User.user import user_router
 from app.api.v1.auth import auth_router
 from app.api.v1.Employer import employer_router
-from app.api.v1.Vacancy import vacancy_router
+from app.api.v1.Vacancy.Vacancy import vacancy_router
+from app.api.v1.Vacancy.VacancyTranslation import vacancyTranslation_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -25,6 +26,7 @@ app.include_router(user_router, prefix= base_prefix + "/users", tags=["users"])
 app.include_router(auth_router, prefix= base_prefix + "/auth", tags=["auth"])
 app.include_router(employer_router, prefix= base_prefix + "/employers", tags=["employers"])
 app.include_router(vacancy_router, prefix= base_prefix + "/vacancies", tags=["vacancies"])
+app.include_router(vacancyTranslation_router, prefix=base_prefix, tags=["vacancies"])
 
 
 # base_router = APIRouter(prefix="/api/v1", tags=["base"])

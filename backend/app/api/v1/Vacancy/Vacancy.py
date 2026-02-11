@@ -20,6 +20,7 @@ async def create_vacancy(payload: VacancyCreate, service: VacancyService = Depen
 
 @vacancy_router.get("/{vacancy_id}", response_model=VacancyRead)
 async def get_vacancy(vacancy_id: int, service: VacancyService = Depends(get_vacancy_service)):
+
     return await service.get_vacancy(vacancy_id)
 
 

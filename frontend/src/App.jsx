@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./auth/AuthContext";
 import Protected from "./auth/Protected";
 import UserProfilePage from "./pages/UserProfilePage";
-import Vacancy from "./components/Vacancy/Vacancy";
+import Vacancy from "./components/Vacancy/VacancyPage";
 import Footer from "./components/Footer";
 
 function About() {

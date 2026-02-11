@@ -6,6 +6,7 @@ from .Company import Company
 from .Employer import Employer
 from .Resume import Resume
 from .Vacancy import Vacancy
+from .VacancyTranslation import VacancyTranslation
 from .Application import Application
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "Company",
     "Employer",
     "Resume",
+    "VacancyTranslation",
     "Vacancy",
     "Application",
 ]
