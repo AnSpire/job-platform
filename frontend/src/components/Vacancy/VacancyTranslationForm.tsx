@@ -52,7 +52,6 @@ export default function VacancyTranslationForm({
           onChange={onChange}
           disabled={saving}
         >
-          <option value="ru">Русский (ru)</option>
           <option value="en">English (en)</option>
           <option value="es">Español (es)</option>
         </select>

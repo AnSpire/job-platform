@@ -1,7 +1,10 @@
 import axios from "axios";
+import i18n from "./i18n";
 
 const ACCESS_KEY = "myapp_access_token";
 const REFRESH_KEY = "myapp_refresh_token";
+const DEFAULT_LANG = "ru";
+const SUPPORTED_LANGS = new Set(["ru", "en", "es"]);
 
 // in-memory
 let accessToken = null;
@@ -27,6 +30,11 @@ function readFromStorage(key) {
   } catch {
     return null;
   }
+}
+
+function resolveRequestLang() {
+  const candidate = (i18n?.resolvedLanguage || i18n?.language || "").toLowerCase().trim();
+  return SUPPORTED_LANGS.has(candidate) ? candidate : DEFAULT_LANG;
 }
 
 // Инициализация переменных при загрузке модуля
@@ -63,10 +71,23 @@ export const api = axios.create({
 
 // Добавляем access в заголовки
 api.interceptors.request.use((config) => {
+  const headers = config.headers ?? {};
+
   // если accessToken существует — ставим его
-  if (accessToken && !config.headers.Authorization) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  if (accessToken && !headers.Authorization) {
+    headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  // Автоматически прокидываем язык, если его явно не задали в конкретном запросе
+  if (typeof headers.get === "function" && typeof headers.set === "function") {
+    if (!headers.get("Accept-Language") && !headers.get("accept-language")) {
+      headers.set("Accept-Language", resolveRequestLang());
+    }
+  } else if (!headers["Accept-Language"] && !headers["accept-language"]) {
+    headers["Accept-Language"] = resolveRequestLang();
+  }
+
+  config.headers = headers;
   return config;
 });
 

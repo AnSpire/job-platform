@@ -14,6 +14,7 @@ from app.repositories.Exceptions import (
     ForeignKeyError,
     ConstraintError,
 )
+from app.utils.i18n.lang import Lang
 
 
 class VacancyService:
@@ -42,9 +43,11 @@ class VacancyService:
             await self.session.rollback()
             raise HTTPException(status_code=400, detail=str(e))
 
-    async def get_vacancy(self, vacancy_id: int) -> VacancyRead:
+    async def get_vacancy(self, vacancy_id: int, *, lang: Lang = "ru") -> VacancyRead:
         try:
-            vacancy = await self.repo.get_by_id(vacancy_id)
+            vacancy = await self.repo.get_localized_by_id(vacancy_id, lang=lang)
+            if not vacancy:
+                raise NotFoundError("vacancy not found")
             return VacancyRead.model_validate(vacancy)
         except NotFoundError as e:
             raise HTTPException(status_code=404, detail=str(e))
@@ -68,8 +71,9 @@ class VacancyService:
         *,
         limit: int = 50,
         offset: int = 0,
+        lang: Lang = "ru",
     ) -> Sequence[VacancyRead]:
-        vacancies = await self.repo.list_all(limit=limit, offset=offset)
+        vacancies = await self.repo.list_all_localized(lang=lang, limit=limit, offset=offset)
         return [VacancyRead.model_validate(v) for v in vacancies]
 
     async def update_vacancy(self, vacancy_id: int, data: VacancyUpdate) -> VacancyRead:

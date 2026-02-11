@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Any, Sequence
 
-from sqlalchemy import select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from app.models.Vacancy import Vacancy
+from app.models.VacancyTranslation import VacancyTranslation
 from app.dto.Vacancy import VacancyCreate, VacancyUpdate  # подстрой под свои пути/имена DTO
 from app.repositories.Exceptions import (
     NotFoundError,
@@ -14,6 +15,7 @@ from app.repositories.Exceptions import (
     ConstraintError,
     ForeignKeyError,
 )
+from app.utils.i18n.lang import Lang
 
 
 def _classify_vacancy_integrity_error(e: IntegrityError) -> Exception:
@@ -68,6 +70,36 @@ class VacancyRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    def _localized_select(self, lang: Lang):
+        v = Vacancy
+        vt = VacancyTranslation
+
+        return (
+            select(
+                v.id.label("id"),
+                v.employer_id.label("employer_id"),
+                func.coalesce(vt.title, v.title).label("title"),
+                func.coalesce(vt.description, v.description).label("description"),
+                func.coalesce(vt.requirements, v.requirements).label("requirements"),
+                func.coalesce(vt.responsibilities, v.responsibilities).label("responsibilities"),
+                v.salary_from.label("salary_from"),
+                v.salary_to.label("salary_to"),
+                v.currency.label("currency"),
+                v.location.label("location"),
+                v.employment_type.label("employment_type"),
+                v.created_at.label("created_at"),
+                v.updated_at.label("updated_at"),
+            )
+            .select_from(v)
+            .outerjoin(
+                vt,
+                and_(
+                    vt.vacancy_id == v.id,
+                    vt.lang == lang,
+                ),
+            )
+        )
+
     async def create(self, data: VacancyCreate) -> Vacancy:
         vacancy = Vacancy(
             title=data.title,
@@ -102,6 +134,15 @@ class VacancyRepository:
             raise NotFoundError("vacancy not found")
         return vacancy
 
+    async def get_localized_by_id(self, vacancy_id: int, lang: Lang) -> dict[str, Any] | None:
+        result = await self.session.execute(
+            self._localized_select(lang).where(Vacancy.id == vacancy_id)
+        )
+        row = result.mappings().first()
+        if not row:
+            return None
+        return dict(row)
+
     async def list_by_employer(
         self,
         employer_id: int,
@@ -131,6 +172,21 @@ class VacancyRepository:
             .offset(offset)
         )
         return result.scalars().all()
+
+    async def list_all_localized(
+        self,
+        *,
+        lang: Lang,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        result = await self.session.execute(
+            self._localized_select(lang)
+            .order_by(Vacancy.created_at.desc(), Vacancy.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return [dict(row) for row in result.mappings().all()]
 
     async def update(self, vacancy_id: int, data: VacancyUpdate) -> Vacancy:
         vacancy = await self.get_raw_by_id(vacancy_id)
