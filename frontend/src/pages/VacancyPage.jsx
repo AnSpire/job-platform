@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import i18n from "../i18n";
@@ -92,11 +92,13 @@ function normalizeTranslationPayload(form) {
 export default function VacancyPage() {
   const { i18n } = useTranslation();
   const { vacancyId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [vacancy, setVacancy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
 
   const [mode, setMode] = useState("view");
@@ -215,6 +217,23 @@ export default function VacancyPage() {
     }
   }
 
+  async function deleteVacancy() {
+    if (!isOwner || deleting) return;
+    const confirmed = window.confirm("Удалить вакансию? Это действие нельзя отменить.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      await api.delete(`/vacancies/${vacancyId}`);
+      navigate("/app/me");
+    } catch {
+      setError("Не удалось удалить вакансию");
+      setDeleting(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="container py-5 text-center">
@@ -240,11 +259,11 @@ export default function VacancyPage() {
   }
 
   return (
-    <div className="container py-5">
+    <div className="container py-5 vacancy-page-shell">
       <div className="row justify-content-center">
-        <div className="col-lg-8">
-          <div className="card">
-            <div className="card-body list-group">
+        <div className="col-12">
+          <div className="vacancy-surface">
+            <div className="vacancy-surface__body">
               {mode === "edit" ? (
                 <VacancyEditForm
                   form={form}
@@ -269,8 +288,10 @@ export default function VacancyPage() {
                   vacancy={vacancy}
                   isOwner={isOwner}
                   error={error}
+                  deleting={deleting}
                   onEdit={startEdit}
                   onTranslate={startTranslate}
+                  onDelete={deleteVacancy}
                 />
               )}
             </div>

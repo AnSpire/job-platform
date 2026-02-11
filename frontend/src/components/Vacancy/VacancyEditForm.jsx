@@ -8,10 +8,10 @@ export default function VacancyEditForm({
   onCancel,
 }) {
   return (
-    <>
-      <div className="d-flex justify-content-between align-items-start gap-3">
-        <div className="w-100">
-          <label className="form-label">Название</label>
+    <div className="vacancy-panel">
+      <div className="vacancy-toolbar">
+        <div className="vacancy-field-group vacancy-field-group--grow">
+          <label className="form-label">Название вакансии</label>
           <input
             className="form-control"
             name="title"
@@ -21,11 +21,16 @@ export default function VacancyEditForm({
           />
         </div>
 
-        <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={onSave} disabled={saving}>
+        <div className="vacancy-actions">
+          <button className="btn btn-primary" onClick={onSave} disabled={saving} type="button">
             {saving ? "Сохранение..." : "Сохранить"}
           </button>
-          <button className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={onCancel}
+            disabled={saving}
+            type="button"
+          >
             Отмена
           </button>
         </div>
@@ -33,9 +38,8 @@ export default function VacancyEditForm({
 
       {error ? <div className="alert alert-danger mt-3 mb-0">{error}</div> : null}
 
-      <div className="mb-3 text-muted mt-3">
-        <div className="row g-3">
-          <div className="col-md-6">
+      <div className="vacancy-grid-2">
+        <div className="vacancy-field-group">
             <label className="form-label">Локация</label>
             <input
               className="form-control"
@@ -44,8 +48,8 @@ export default function VacancyEditForm({
               onChange={onChange}
               disabled={saving}
             />
-          </div>
-          <div className="col-md-6">
+        </div>
+        <div className="vacancy-field-group">
             <label className="form-label">Тип занятости</label>
             <input
               className="form-control"
@@ -55,13 +59,11 @@ export default function VacancyEditForm({
               disabled={saving}
               placeholder="Напр. Full-time / Part-time"
             />
-          </div>
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className="row g-3 align-items-end">
-          <div className="col-md-4">
+      <div className="vacancy-grid-3">
+        <div className="vacancy-field-group">
             <label className="form-label">Зарплата от</label>
             <input
               type="number"
@@ -71,8 +73,8 @@ export default function VacancyEditForm({
               onChange={onChange}
               disabled={saving}
             />
-          </div>
-          <div className="col-md-4">
+        </div>
+        <div className="vacancy-field-group">
             <label className="form-label">Зарплата до</label>
             <input
               type="number"
@@ -82,8 +84,8 @@ export default function VacancyEditForm({
               onChange={onChange}
               disabled={saving}
             />
-          </div>
-          <div className="col-md-4">
+        </div>
+        <div className="vacancy-field-group">
             <label className="form-label">Валюта</label>
             <input
               className="form-control"
@@ -93,17 +95,14 @@ export default function VacancyEditForm({
               disabled={saving}
               placeholder="RUB, EUR, USD..."
             />
-          </div>
         </div>
-
-        {canShowSalary ? (
-          <div className="mt-2 text-muted small">
-            Подсказка: оставь пустым поле, если не нужно
-          </div>
-        ) : null}
       </div>
 
-      <div className="content-block list-group-item">
+      {canShowSalary ? (
+        <div className="vacancy-helper-text">Подсказка: оставь пустым поле, если не нужно</div>
+      ) : null}
+
+      <div className="vacancy-content-block">
         <h5>Описание</h5>
         <textarea
           className="form-control"
@@ -115,7 +114,7 @@ export default function VacancyEditForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <h5>Требования</h5>
         <textarea
           className="form-control"
@@ -127,7 +126,7 @@ export default function VacancyEditForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <h5>Обязанности</h5>
         <textarea
           className="form-control"
@@ -138,6 +137,6 @@ export default function VacancyEditForm({
           rows={4}
         />
       </div>
-    </>
+    </div>
   );
 }

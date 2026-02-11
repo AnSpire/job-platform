@@ -27,15 +27,20 @@ export default function VacancyTranslationForm({
   onCancel,
 }: Props) {
   return (
-    <>
-      <div className="d-flex justify-content-between align-items-start gap-3">
-        <h2 className="h4 mb-3">Добавить перевод</h2>
+    <div className="vacancy-panel">
+      <div className="vacancy-toolbar">
+        <h2 className="vacancy-form-title">Добавить перевод</h2>
 
-        <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={onSave} disabled={saving}>
+        <div className="vacancy-actions">
+          <button className="btn btn-primary" onClick={onSave} disabled={saving} type="button">
             {saving ? "Сохранение..." : "Сохранить"}
           </button>
-          <button className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={onCancel}
+            disabled={saving}
+            type="button"
+          >
             Отмена
           </button>
         </div>
@@ -43,7 +48,7 @@ export default function VacancyTranslationForm({
 
       {error ? <div className="alert alert-danger mt-3 mb-0">{error}</div> : null}
 
-      <div className="mb-3 mt-3">
+      <div className="vacancy-field-group">
         <label className="form-label">Язык перевода</label>
         <select
           className="form-select"
@@ -57,7 +62,7 @@ export default function VacancyTranslationForm({
         </select>
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <label className="form-label">Название</label>
         <input
           className="form-control"
@@ -68,7 +73,7 @@ export default function VacancyTranslationForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <label className="form-label">Локация</label>
         <input
           className="form-control"
@@ -79,7 +84,7 @@ export default function VacancyTranslationForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <label className="form-label">Описание</label>
         <textarea
           className="form-control"
@@ -91,7 +96,7 @@ export default function VacancyTranslationForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <label className="form-label">Требования</label>
         <textarea
           className="form-control"
@@ -103,7 +108,7 @@ export default function VacancyTranslationForm({
         />
       </div>
 
-      <div className="content-block list-group-item">
+      <div className="vacancy-content-block">
         <label className="form-label">Обязанности</label>
         <textarea
           className="form-control"
@@ -114,6 +119,6 @@ export default function VacancyTranslationForm({
           rows={4}
         />
       </div>
-    </>
+    </div>
   );
 }

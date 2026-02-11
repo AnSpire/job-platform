@@ -1,15 +1,149 @@
-.content-block {
-  min-height: 120px;
+.vacancy-page-shell {
+  max-width: 1000px;
 }
 
-@media (min-width: 768px) {
-  .content-block {
-    min-height: 180px;
+.vacancy-surface {
+  border-radius: 18px;
+  border: 1px solid #dbe4ff;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(191, 219, 254, 0.35), transparent 38%),
+    #ffffff;
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+}
+
+.vacancy-surface__body {
+  padding: 22px;
+}
+
+.vacancy-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.vacancy-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vacancy-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.3vw, 1.9rem);
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.vacancy-form-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vacancy-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.vacancy-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e3a8a;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.vacancy-chip--muted {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.vacancy-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vacancy-salary {
+  margin-top: 4px;
+}
+
+.vacancy-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.vacancy-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.vacancy-field-group {
+  display: grid;
+  gap: 7px;
+}
+
+.vacancy-field-group--grow {
+  flex: 1;
+}
+
+.vacancy-helper-text {
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.vacancy-content-block {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.vacancy-content-block h5 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.vacancy-content-block p {
+  margin: 0;
+  color: #334155;
+  white-space: pre-line;
+}
+
+.vacancy-published {
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+  .vacancy-grid-3 {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (min-width: 992px) {
-  .content-block {
-    min-height: 240px;
+@media (max-width: 768px) {
+  .vacancy-toolbar {
+    flex-direction: column;
+  }
+
+  .vacancy-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .vacancy-surface__body {
+    padding: 16px;
   }
 }

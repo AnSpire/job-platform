@@ -1,5 +1,5 @@
 import { useAuth } from "../auth/AuthContext";
-import EmployerProfile from "../components/EmployerProfile";
+import EmployerProfile from "../components/EmployerProfile/EmployerProfile";
 import StudentProfile from "../components/StudentProfile";
 import "./UserProfile.css";
 

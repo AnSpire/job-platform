@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import "./EmployerProfile.css";
-import Modal from "./Modal";
-import ProfileCard from "./ProfileCard";
-import CreateVacancyForm from "./CreateVacancyForm";
-import { api } from "../api.js";
-import { Link } from "react-router";
-import i18n from "../i18n/index.js";
+import "../EmployerProfile.css";
+import Modal from "../Modal";
+import ProfileCard from "../ProfileCard";
+import CreateVacancyForm from "../CreateVacancyForm";
+import CompanyInfoSection from "./CompanyInfoSection";
+import VacanciesSection from "./VacanciesSection";
+import { api } from "../../api.js";
+import i18n from "../../i18n/index.js";
 
 const EMPTY_VACANCY = {
   title: "",
@@ -88,16 +89,6 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
   const [vacanciesLoading, setVacanciesLoading] = useState(false);
   const [vacanciesLoadError, setVacanciesLoadError] = useState(null);
   const modalTitle = useMemo(() => t("employerProfile.modal.title"), [t]);
-  const companyInfo = {
-    name: "ApexHire",
-    industry: "HR Tech",
-    teamSize: "80-120",
-    website: "https://apexhire.example",
-    city: "Berlin",
-    country: "Germany",
-    about:
-      "Building tools for smarter hiring pipelines and candidate experience.",
-  };
 
   useEffect(() => {
     const employerId = user?.employer_id;
@@ -225,100 +216,15 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
             updateProfile={updateProfile}
             logout={logout}
           />
-
-          <section className="employer-company-card">
-            <div className="employer-company-card__head">
-              <h3>{t("employerProfile.company.title")}</h3>
-              <span>{t("employerProfile.company.hardcodedBadge")}</span>
-            </div>
-
-            <p className="employer-company-card__name">{companyInfo.name}</p>
-
-            <div className="employer-company-card__grid">
-              <div>
-                <span>{t("employerProfile.company.industry")}</span>
-                <strong>{companyInfo.industry}</strong>
-              </div>
-              <div>
-                <span>{t("employerProfile.company.teamSize")}</span>
-                <strong>{companyInfo.teamSize}</strong>
-              </div>
-              <div>
-                <span>{t("employerProfile.company.location")}</span>
-                <strong>
-                  {companyInfo.city}, {companyInfo.country}
-                </strong>
-              </div>
-              <div>
-                <span>{t("employerProfile.company.website")}</span>
-                <strong>{companyInfo.website}</strong>
-              </div>
-            </div>
-
-            <p className="employer-company-card__about">
-              {t("employerProfile.company.about")}: {companyInfo.about}
-            </p>
-          </section>
+          <CompanyInfoSection />
         </aside>
 
-        <section className="employer-vacancies-card">
-          <div className="employer-vacancies-card__top">
-            <div>
-              <h3>{t("employerProfile.myVacancies")}</h3>
-              <p>{t("employerProfile.vacancies.subtitle")}</p>
-            </div>
-            <button
-              className="employer-vacancies-card__create-btn"
-              onClick={openVacancyModal}
-            >
-              {t("employerProfile.createVacancy")}
-            </button>
-          </div>
-
-          <div className="employer-vacancies-card__list-wrap">
-            {vacanciesLoading ? (
-              <div className="employer-vacancies-card__hint">
-                {t("employerProfile.vacancies.loading")}
-              </div>
-            ) : vacancies.length === 0 ? (
-              <div className="employer-vacancies-card__hint">
-                {t("employerProfile.vacancies.empty")}
-              </div>
-            ) : (
-              <ul className="employer-vacancies-card__list">
-                {vacancies.map((v) => (
-                  <li key={v.id} className="employer-vacancies-card__item">
-                    <Link
-                      to={`/vacancies/${v.id}`}
-                      className="employer-vacancies-card__link"
-                    >
-                      <div className="employer-vacancies-card__item-top">
-                        <div className="employer-vacancies-card__item-title">
-                          {v.title}
-                        </div>
-                        {v.employment_type && (
-                          <span className="employer-vacancies-card__item-type">
-                            {v.employment_type}
-                          </span>
-                        )}
-                      </div>
-                      <div className="employer-vacancies-card__item-location">
-                        {v.location ||
-                          t("employerProfile.vacancies.locationFallback")}
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {vacanciesLoadError && (
-              <div className="alert alert-danger py-2 mt-3" role="alert">
-                {vacanciesLoadError}
-              </div>
-            )}
-          </div>
-        </section>
+        <VacanciesSection
+          vacancies={vacancies}
+          vacanciesLoading={vacanciesLoading}
+          vacanciesLoadError={vacanciesLoadError}
+          onCreateClick={openVacancyModal}
+        />
       </div>
 
       <Modal
