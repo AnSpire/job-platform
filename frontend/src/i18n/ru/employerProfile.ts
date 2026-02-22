@@ -18,12 +18,20 @@ export default {
 
   company: {
     title: "Компания работодателя",
-    hardcodedBadge: "Demo",
+    liveBadge: "Live",
     industry: "Сфера",
-    teamSize: "Размер команды",
     location: "Локация",
     website: "Сайт",
     about: "О компании",
+    loading: "Загрузка информации о компании...",
+    employerMissing: "У текущего пользователя не найден employer_id.",
+    notAssigned: "Сейчас работодателю не присвоена никакая компания.",
+    fetchError: "Не удалось загрузить информацию о компании (HTTP {{status}})",
+    noData: "Не указано",
+    websiteUnavailable: "Сайт не указан",
+    locationUnavailable: "Локация не указана",
+    descriptionUnavailable: "Описание пока отсутствует",
+    logoAlt: "Логотип компании {{name}}",
   },
 
   vacancies: {

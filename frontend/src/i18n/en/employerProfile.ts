@@ -18,12 +18,20 @@ export default {
 
   company: {
     title: "Employer company",
-    hardcodedBadge: "Demo",
+    liveBadge: "Live",
     industry: "Industry",
-    teamSize: "Team size",
     location: "Location",
     website: "Website",
     about: "About company",
+    loading: "Loading company details...",
+    employerMissing: "No employer_id found for the current user.",
+    notAssigned: "No company is assigned to this employer yet.",
+    fetchError: "Failed to load company info (HTTP {{status}})",
+    noData: "Not specified",
+    websiteUnavailable: "Website not specified",
+    locationUnavailable: "Location not specified",
+    descriptionUnavailable: "No description yet",
+    logoAlt: "{{name}} company logo",
   },
 
   vacancies: {

@@ -216,7 +216,7 @@ export default function EmployerProfile({ user, updateProfile, logout }) {
             updateProfile={updateProfile}
             logout={logout}
           />
-          <CompanyInfoSection />
+          <CompanyInfoSection user={user} />
         </aside>
 
         <VacanciesSection

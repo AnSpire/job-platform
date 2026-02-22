@@ -52,13 +52,55 @@
   border-radius: 999px;
   padding: 4px 9px;
   font-size: 0.72rem;
-  color: #0f766e;
-  background: #dcfce7;
+  color: #075985;
+  background: #e0f2fe;
   font-weight: 700;
 }
 
+.employer-company-card__company {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.employer-company-card__logo-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #e2e8f0, #bfdbfe);
+  border: 1px solid #cbd5e1;
+  display: grid;
+  place-items: center;
+}
+
+.employer-company-card__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.employer-company-card__logo-fallback {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.employer-company-card__state {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.employer-company-card__state--error {
+  color: #991b1b;
+}
+
 .employer-company-card__name {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 1.12rem;
   color: #1e3a8a;
   font-weight: 700;
@@ -84,6 +126,15 @@
   color: #0f172a;
   font-size: 0.88rem;
   overflow-wrap: anywhere;
+}
+
+.employer-company-card__link {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.employer-company-card__link:hover {
+  text-decoration: underline;
 }
 
 .employer-company-card__about {

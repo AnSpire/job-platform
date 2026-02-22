@@ -18,12 +18,20 @@ export default {
 
   company: {
     title: "Empresa del empleador",
-    hardcodedBadge: "Demo",
+    liveBadge: "Live",
     industry: "Sector",
-    teamSize: "Tamaño del equipo",
     location: "Ubicación",
     website: "Sitio web",
     about: "Sobre la empresa",
+    loading: "Cargando la información de la empresa...",
+    employerMissing: "No se encontró employer_id para el usuario actual.",
+    notAssigned: "Todavía no hay ninguna empresa asignada a este empleador.",
+    fetchError: "No se pudo cargar la información de la empresa (HTTP {{status}})",
+    noData: "No especificado",
+    websiteUnavailable: "Sitio web no especificado",
+    locationUnavailable: "Ubicación no especificada",
+    descriptionUnavailable: "Aún no hay descripción",
+    logoAlt: "Logotipo de la empresa {{name}}",
   },
 
   vacancies: {
