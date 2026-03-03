@@ -75,7 +75,7 @@ class UserService:
     async def get_user_by_id(self, user_id: int) -> UserRead:
         try:
             user = await self.user_repo.get_by_id(user_id)  # ORM
-            return UserRead.model_validate(user)
+            return self._to_user_read(user)
         except NotFoundError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -88,7 +88,7 @@ class UserService:
 
     async def list_users(self) -> list[UserRead]:
         users = await self.user_repo.list_users()
-        return [UserRead.model_validate(user) for user in users]
+        return [self._to_user_read(user) for user in users]
 
     async def update_user(self, user_id: int, data: UserUpdate) -> UserRead:
         try:
@@ -109,5 +109,25 @@ class UserService:
         except Exception:
             await self.session.rollback()
             raise
+
+    @staticmethod
+    def _to_user_read(user: User) -> UserRead:
+        employer_id = None
+        student_id = None
+
+        if user.role == "employer" and user.employer_profile:
+            employer_id = user.employer_profile.id
+        elif user.role == "student" and user.student_profile:
+            student_id = user.student_profile.id
+
+        return UserRead(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role,
+            employer_id=employer_id,
+            student_id=student_id,
+        )
 
     

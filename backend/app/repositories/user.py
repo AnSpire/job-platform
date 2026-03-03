@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.dto.User import UserRead, UserInDB, UserUpdate, UserCreate
 from app.models.User import User
@@ -93,7 +94,14 @@ class UserRepository:
 
 
     async def get_raw_by_id(self, user_id: int) -> User | None:
-        result = await self.session.execute(select(User).where(User.id == user_id))
+        result = await self.session.execute(
+            select(User)
+            .options(
+                selectinload(User.employer_profile),
+                selectinload(User.student_profile),
+            )
+            .where(User.id == user_id)
+        )
         return result.scalar_one_or_none()
 
 
@@ -114,7 +122,12 @@ class UserRepository:
         return await self.get_raw_by_email(email)
 
     async def list_users(self) -> list[User]:
-        result = await self.session.execute(select(User))
+        result = await self.session.execute(
+            select(User).options(
+                selectinload(User.employer_profile),
+                selectinload(User.student_profile),
+            )
+        )
         return result.scalars().all()
 
 

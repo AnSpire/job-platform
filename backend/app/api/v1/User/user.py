@@ -61,6 +61,11 @@ async def get_employer_id(current_user: UserRead=Security(get_current_user), emp
 
 
 
+@user_router.get("/{user_id}", response_model=UserRead, tags=["users"])
+async def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service)):
+    return await service.get_user_by_id(user_id)
+
+
 @user_router.patch("/me", response_model=UserRead, tags=["users"])
 async def update_me(
     update_data: UserUpdate,

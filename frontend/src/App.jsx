@@ -9,6 +9,7 @@ import Protected from "./auth/Protected";
 import UserProfilePage from "./pages/UserProfilePage";
 import Vacancy from "./pages/VacancyPage";
 import Footer from "./components/Footer";
+import AdminPage from "./pages/AdminPage";
 
 function About() {
   return <h2>О нас</h2>;
@@ -32,6 +33,14 @@ function App() {
                 element={
                   <Protected>
                     <UserProfilePage />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <Protected>
+                    <AdminPage />
                   </Protected>
                 }
               />
