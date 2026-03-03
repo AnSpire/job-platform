@@ -10,6 +10,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import Vacancy from "./pages/VacancyPage";
 import Footer from "./components/Footer";
 import AdminPage from "./pages/AdminPage";
+import AdminUserPage from "./pages/AdminUserPage";
 
 function About() {
   return <h2>О нас</h2>;
@@ -41,6 +42,14 @@ function App() {
                 element={
                   <Protected>
                     <AdminPage />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/admin/users/:userId"
+                element={
+                  <Protected>
+                    <AdminUserPage />
                   </Protected>
                 }
               />
