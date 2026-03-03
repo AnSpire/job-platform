@@ -1,56 +1,121 @@
 import React, { useState } from "react";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// import "./Register.css";
+import { useTranslation } from "react-i18next";
+
+const KNOWN_FIELDS = new Set(["first_name", "email", "password", "role"]);
+
+function parseRegisterErrors(errorData, fallback) {
+  const fieldErrors = {};
+  const generalParts = [];
+
+  if (Array.isArray(errorData?.errors)) {
+    for (const item of errorData.errors) {
+      if (!item || typeof item !== "object") continue;
+      const msg = typeof item.msg === "string" ? item.msg : null;
+      if (!msg) continue;
+
+      const loc = item.loc;
+      let field = null;
+      if (Array.isArray(loc) && loc.length > 0) {
+        field = String(loc[loc.length - 1]);
+      } else if (typeof loc === "string") {
+        const parts = loc.split(".");
+        field = parts[parts.length - 1];
+      }
+
+      if (field && KNOWN_FIELDS.has(field)) {
+        fieldErrors[field] = msg;
+      } else {
+        generalParts.push(msg);
+      }
+    }
+  }
+
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+  const detail = typeof errorData?.detail === "string" ? errorData.detail : null;
+  const message = typeof errorData?.message === "string" ? errorData.message : null;
+  const stringBody = typeof errorData === "string" ? errorData : null;
+
+  if (generalParts.length > 0) {
+    return { fieldErrors, generalError: generalParts.join("; ") };
+  }
+
+  if (hasFieldErrors) {
+    if (detail && detail !== "Validation error") {
+      return { fieldErrors, generalError: detail };
+    }
+    return { fieldErrors, generalError: null };
+  }
+
+  return {
+    fieldErrors,
+    generalError: detail || message || stringBody || fallback,
+  };
+}
 
 function RegistrationForm() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     first_name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [generalError, setGeneralError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const nav = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.first_name.trim()) newErrors.name = "Введите имя";
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = t("auth.register.validation.nameRequired");
+    }
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
-      newErrors.email = "Некорректный email";
+      newErrors.email = t("auth.register.validation.invalidEmail");
     if (formData.password.length < 6)
-      newErrors.password = "Пароль должен содержать минимум 6 символов";
+      newErrors.password = t("auth.register.validation.passwordTooShort");
     if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Пароли не совпадают";
+      newErrors.confirmPassword = t("auth.register.validation.passwordsMismatch");
+    if (!formData.role) newErrors.role = t("auth.register.validation.roleRequired");
 
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setGeneralError(null);
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      setFieldErrors(validationErrors);
       setSubmitted(false);
       return;
     }
 
-    setErrors({});
+    setFieldErrors({});
     setSubmitted(false);
-
-    const { confirmPassword, ...dataToSend } = formData;
-    console.log(formData)
+    const dataToSend = {
+      first_name: formData.first_name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role,
+    };
 
     try {
       const response = await fetch(
@@ -63,22 +128,25 @@ function RegistrationForm() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Ошибка регистрации:", errorData);
-        alert(
-          "Ошибка при регистрации: " +
-            (errorData.detail || "Неизвестная ошибка")
+        let errorData = null;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = null;
+        }
+        const parsed = parseRegisterErrors(
+          errorData,
+          t("auth.register.errors.fallback")
         );
+        setFieldErrors(parsed.fieldErrors);
+        setGeneralError(parsed.generalError);
         return;
       }
 
-      const data = await response.json();
-      console.log("✅ Регистрация прошла успешно:", data);
       setSubmitted(true);
-      nav("/auth/login", {replace: true})
-    } catch (error) {
-      console.error("Ошибка при соединении с сервером:", error);
-      alert("Не удалось подключиться к серверу.");
+      nav("/auth/login", { replace: true });
+    } catch {
+      setGeneralError(t("auth.register.errors.network"));
     }
   };
 
@@ -88,11 +156,17 @@ function RegistrationForm() {
         <div className="col-12 col-md-8 col-lg-5">
           <div className="card shadow-sm">
             <div className="card-body p-4">
-              <h2 className="h4 text-center mb-4">Регистрация</h2>
+              <h2 className="h4 text-center mb-4">{t("auth.register.title")}</h2>
 
               {submitted && (
                 <div className="alert alert-success" role="alert">
-                  Регистрация успешно завершена!
+                  {t("auth.register.success")}
+                </div>
+              )}
+
+              {generalError && (
+                <div className="alert alert-danger py-2" role="alert">
+                  {generalError}
                 </div>
               )}
 
@@ -100,20 +174,20 @@ function RegistrationForm() {
                 {/* Имя */}
                 <div className="mb-3">
                   <label htmlFor="name" className="form-label">
-                    Имя
+                    {t("auth.register.fields.firstName")}
                   </label>
                   <input
                     type="text"
                     id="first_name"
                     name="first_name"
                     className={`form-control ${
-                      errors.name ? "is-invalid" : ""
+                      fieldErrors.first_name ? "is-invalid" : ""
                     }`}
                     value={formData.first_name}
                     onChange={handleChange}
                   />
-                  {errors.name && (
-                    <div className="invalid-feedback">{errors.name}</div>
+                  {fieldErrors.first_name && (
+                    <div className="invalid-feedback">{fieldErrors.first_name}</div>
                   )}
                 </div>
 
@@ -121,40 +195,40 @@ function RegistrationForm() {
                 {/* Email */}
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
-                    Email
+                    {t("auth.register.fields.email")}
                   </label>
                   <input
                     type="email"
                     id="email"
                     name="email"
                     className={`form-control ${
-                      errors.email ? "is-invalid" : ""
+                      fieldErrors.email ? "is-invalid" : ""
                     }`}
                     value={formData.email}
                     onChange={handleChange}
                   />
-                  {errors.email && (
-                    <div className="invalid-feedback">{errors.email}</div>
+                  {fieldErrors.email && (
+                    <div className="invalid-feedback">{fieldErrors.email}</div>
                   )}
                 </div>
 
                 {/* Пароль */}
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">
-                    Пароль
+                    {t("auth.register.fields.password")}
                   </label>
                   <input
                     type="password"
                     id="password"
                     name="password"
                     className={`form-control ${
-                      errors.password ? "is-invalid" : ""
+                      fieldErrors.password ? "is-invalid" : ""
                     }`}
                     value={formData.password}
                     onChange={handleChange}
                   />
-                  {errors.password && (
-                    <div className="invalid-feedback">{errors.password}</div>
+                  {fieldErrors.password && (
+                    <div className="invalid-feedback">{fieldErrors.password}</div>
                   )}
                 </div>
 
@@ -162,21 +236,21 @@ function RegistrationForm() {
                 {/* Подтверждение */}
                 <div className="mb-4">
                   <label htmlFor="confirmPassword" className="form-label">
-                    Подтверждение пароля
+                    {t("auth.register.fields.confirmPassword")}
                   </label>
                   <input
                     type="password"
                     id="confirmPassword"
                     name="confirmPassword"
                     className={`form-control ${
-                      errors.confirmPassword ? "is-invalid" : ""
+                      fieldErrors.confirmPassword ? "is-invalid" : ""
                     }`}
                     value={formData.confirmPassword}
                     onChange={handleChange}
                   />
-                  {errors.confirmPassword && (
+                  {fieldErrors.confirmPassword && (
                     <div className="invalid-feedback">
-                      {errors.confirmPassword}
+                      {fieldErrors.confirmPassword}
                     </div>
                   )}
                 </div>
@@ -185,26 +259,28 @@ function RegistrationForm() {
                 {/* Роль */}
                 <div className="mb-3">
                   <label htmlFor="role" className="form-label">
-                    Роль
+                    {t("auth.register.fields.role")}
                   </label>
                   <select
                     id="role"
                     name="role"
-                    className={`form-control ${errors.role ? "is-invalid" : ""}`}
+                    className={`form-control ${fieldErrors.role ? "is-invalid" : ""}`}
                     value={formData.role}
                     onChange={handleChange}
                   >
-                    <option value="" disabled hidden>Выберите роль</option>
-                    <option value="student">Студент</option>
-                    <option value="employer">Наниматель</option>
+                    <option value="" disabled hidden>
+                      {t("auth.register.fields.rolePlaceholder")}
+                    </option>
+                    <option value="student">{t("auth.register.roles.student")}</option>
+                    <option value="employer">{t("auth.register.roles.employer")}</option>
                   </select>
-                  {errors.role && (
-                    <div className="invalid-feedback">{errors.role}</div>
+                  {fieldErrors.role && (
+                    <div className="invalid-feedback">{fieldErrors.role}</div>
                   )}
                 </div>
 
                 <button type="submit" className="btn btn-primary w-100">
-                  Зарегистрироваться
+                  {t("auth.register.submit")}
                 </button>
               </form>
             </div>
@@ -212,7 +288,7 @@ function RegistrationForm() {
 
           <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: 14 }}>
             <Link to="/auth/login">
-              Уже есть аккаунт? {/* сюда можно добавить ссылку на логин */}
+              {t("auth.register.alreadyHaveAccount")}
             </Link>
           </p>
         </div>

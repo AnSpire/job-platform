@@ -5,16 +5,19 @@ import headerRu from "./ru/header";
 import footerRu from "./ru/footer";
 import vacanciesRu from "./ru/vacancies";
 import employerProfileRu from "./ru/employerProfile";
+import authRu from "./ru/auth";
 
 import headerEn from "./en/header";
 import footerEn from "./en/footer";
 import vacanciesEn from "./en/vacancies";
 import employerProfileEn from "./en/employerProfile";
+import authEn from "./en/auth";
 
 import headerEs from "./es/header";
 import footerEs from "./es/footer";
 import vacanciesEs from "./es/vacancies";
 import employerProfileEs from "./es/employerProfile";
+import authEs from "./es/auth";
 
 const resources = {
   ru: {
@@ -22,7 +25,8 @@ const resources = {
       header: headerRu,
       footer: footerRu,
       vacancies: vacanciesRu,
-      employerProfile: employerProfileRu
+      employerProfile: employerProfileRu,
+      auth: authRu,
     },
   },
   en: {
@@ -30,7 +34,8 @@ const resources = {
       header: headerEn,
       footer: footerEn,
       vacancies: vacanciesEn,
-      employerProfile: employerProfileEn
+      employerProfile: employerProfileEn,
+      auth: authEn,
     },
   },
   es: {
@@ -38,7 +43,8 @@ const resources = {
       header: headerEs,
       footer: footerEs,
       vacancies: vacanciesEs,
-      employerProfile: employerProfileEs
+      employerProfile: employerProfileEs,
+      auth: authEs,
     },
   },
 };

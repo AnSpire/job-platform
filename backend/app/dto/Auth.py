@@ -1,8 +1,10 @@
 from pydantic import BaseModel, EmailStr
+from pydantic import Field
+from typing import Annotated
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: Annotated[str, Field(min_length=1)]
 
 
 class TokenPair(BaseModel):

@@ -28,4 +28,15 @@ export default {
     internship: "Стажировка",
     remote: "Удалённо",
   },
+
+  view: {
+    edit: "Редактировать",
+    addTranslation: "Добавить перевод",
+    delete: "Удалить",
+    deleting: "Удаление...",
+    description: "Описание",
+    requirements: "Требования",
+    responsibilities: "Обязанности",
+    notSpecified: "—",
+  },
 };

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 export default function VacancyView({
   vacancy,
   isOwner,
@@ -19,6 +21,24 @@ export default function VacancyView({
     responsibilities,
     created_at,
   } = vacancy;
+  const { t, i18n } = useTranslation();
+
+  const employmentTypeKey = employment_type
+    ? `vacancies.employment.${employment_type}`
+    : null;
+  const employmentLabel =
+    employmentTypeKey && t(employmentTypeKey) !== employmentTypeKey
+      ? t(employmentTypeKey)
+      : employment_type;
+
+  const salaryText =
+    salary_from != null && salary_to != null
+      ? t("vacancies.salary.range", { from: salary_from, to: salary_to, currency: currency ?? "" })
+      : salary_from != null
+        ? t("vacancies.salary.from", { from: salary_from, currency: currency ?? "" })
+        : salary_to != null
+          ? t("vacancies.salary.to", { to: salary_to, currency: currency ?? "" })
+          : null;
 
   return (
     <div className="vacancy-panel">
@@ -27,8 +47,8 @@ export default function VacancyView({
           <h1 className="vacancy-title">{title}</h1>
           <div className="vacancy-meta">
             {location ? <span className="vacancy-chip">{location}</span> : null}
-            {employment_type ? (
-              <span className="vacancy-chip vacancy-chip--muted">{employment_type}</span>
+            {employmentLabel ? (
+              <span className="vacancy-chip vacancy-chip--muted">{employmentLabel}</span>
             ) : null}
           </div>
         </div>
@@ -36,12 +56,12 @@ export default function VacancyView({
         <div className="vacancy-actions">
           {isOwner ? (
             <button className="btn btn-outline-primary" onClick={onEdit} type="button">
-              Редактировать
+              {t("vacancies.view.edit")}
             </button>
           ) : null}
           {isOwner ? (
             <button className="btn btn-secondary" onClick={onTranslate} type="button">
-              Добавить перевод
+              {t("vacancies.view.addTranslation")}
             </button>
           ) : null}
           {isOwner ? (
@@ -51,7 +71,7 @@ export default function VacancyView({
               disabled={deleting}
               type="button"
             >
-              {deleting ? "Удаление..." : "Удалить"}
+              {deleting ? t("vacancies.view.deleting") : t("vacancies.view.delete")}
             </button>
           ) : null}
         </div>
@@ -59,33 +79,30 @@ export default function VacancyView({
 
       {error ? <div className="alert alert-danger mt-3 mb-0">{error}</div> : null}
 
-      {salary_from || salary_to ? (
+      {salaryText ? (
         <div className="vacancy-salary">
-          <span className="badge bg-success fs-6 px-3 py-2">
-            {salary_from ? `от ${salary_from} ` : ""}
-            {salary_to ? `до ${salary_to} ` : ""}
-            {currency ?? ""}
-          </span>
+          <span className="badge bg-success fs-6 px-3 py-2">{salaryText}</span>
         </div>
       ) : null}
 
       <div className="vacancy-content-block">
-        <h5>Описание</h5>
-        <p>{description}</p>
+        <h5>{t("vacancies.view.description")}</h5>
+        <p>{description || t("vacancies.noDescription")}</p>
       </div>
 
       <div className="vacancy-content-block">
-        <h5>Требования</h5>
-        <p>{requirements || "—"}</p>
+        <h5>{t("vacancies.view.requirements")}</h5>
+        <p>{requirements || t("vacancies.view.notSpecified")}</p>
       </div>
 
       <div className="vacancy-content-block">
-        <h5>Обязанности</h5>
-        <p>{responsibilities || "—"}</p>
+        <h5>{t("vacancies.view.responsibilities")}</h5>
+        <p>{responsibilities || t("vacancies.view.notSpecified")}</p>
       </div>
 
       <div className="vacancy-published">
-        Опубликовано: {created_at ? new Date(created_at).toLocaleDateString() : "—"}
+        {t("vacancies.published")}{" "}
+        {created_at ? new Date(created_at).toLocaleDateString(i18n.language) : t("vacancies.view.notSpecified")}
       </div>
     </div>
   );

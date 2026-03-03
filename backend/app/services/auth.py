@@ -13,7 +13,7 @@ class AuthService:
     async def login_user(self, payload: LoginRequest):
         user: User = await self.user_repo.get_by_email(payload.email)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
         if not check_password(payload.password, user.password_hash):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
         access_token = create_access_token(user_id=user.id, email=user.email)

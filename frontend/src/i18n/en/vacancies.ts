@@ -28,4 +28,15 @@ export default {
     internship: "Internship",
     remote: "Remote",
   },
+
+  view: {
+    edit: "Edit",
+    addTranslation: "Add translation",
+    delete: "Delete",
+    deleting: "Deleting...",
+    description: "Description",
+    requirements: "Requirements",
+    responsibilities: "Responsibilities",
+    notSpecified: "—",
+  },
 };

@@ -110,11 +110,8 @@ class UserRepository:
 
 
     
-    async def get_by_email(self, email: str) -> User:
-        user = await self.get_raw_by_email(email)
-        if not user:
-            raise NotFoundError("user not found")
-        return user
+    async def get_by_email(self, email: str) -> User | None:
+        return await self.get_raw_by_email(email)
 
 
 
