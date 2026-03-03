@@ -50,7 +50,7 @@ function mapVacancyToTranslationForm(vacancy) {
   if (!vacancy) return EMPTY_TRANSLATION_FORM;
 
   return {
-    lang: ["ru", "en", "es"].includes(i18n.language) ? i18n.language : "en",
+    lang: vacancy.lang ?? EMPTY_TRANSLATION_FORM.lang,
     title: vacancy.title ?? "",
     location: vacancy.location ?? "",
     description: vacancy.description ?? "",
@@ -200,7 +200,8 @@ export default function VacancyPage() {
 
     try {
       const payload = normalizeTranslationPayload(translationForm);
-      await api.put(`/vacancies/${vacancyId}/translations/${translationForm.lang}`, payload);
+      const translationLang = translationForm.lang ?? EMPTY_TRANSLATION_FORM.lang;
+      await api.put(`/vacancies/${vacancyId}/translations/${translationLang}`, payload);
       setMode("view");
     } catch (error) {
       console.error("Ошибка при сохранении перевода:", error);
