@@ -48,6 +48,26 @@ export default {
     submitting: "Creando...",
   },
 
+  vacancyForm: {
+    fields: {
+      title: "Título",
+      description: "Descripción",
+      requirements: "Requisitos",
+      responsibilities: "Responsabilidades",
+      salaryFrom: "Salario desde",
+      salaryTo: "Salario hasta",
+      currency: "Moneda",
+      location: "Ubicación",
+      employmentType: "Tipo de empleo",
+    },
+    placeholders: {
+      currency: "EUR, USD...",
+    },
+    employment: {
+      notSelected: "(no seleccionado)",
+    },
+  },
+
   errors: {
     createFailed: "No se pudo crear la vacante",
     loadFailed: "No se pudieron cargar las vacantes (HTTP {{status}})",

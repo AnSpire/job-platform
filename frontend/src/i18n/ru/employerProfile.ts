@@ -48,6 +48,26 @@ export default {
     submitting: "Создание...",
   },
 
+  vacancyForm: {
+    fields: {
+      title: "Название",
+      description: "Описание",
+      requirements: "Требования",
+      responsibilities: "Обязанности",
+      salaryFrom: "Зарплата от",
+      salaryTo: "Зарплата до",
+      currency: "Валюта",
+      location: "Локация",
+      employmentType: "Тип занятости",
+    },
+    placeholders: {
+      currency: "EUR, USD...",
+    },
+    employment: {
+      notSelected: "(не выбрано)",
+    },
+  },
+
   errors: {
     createFailed: "Не удалось создать вакансию",
     loadFailed: "Не удалось загрузить вакансии (HTTP {{status}})",

@@ -48,6 +48,26 @@ export default {
     submitting: "Creating...",
   },
 
+  vacancyForm: {
+    fields: {
+      title: "Title",
+      description: "Description",
+      requirements: "Requirements",
+      responsibilities: "Responsibilities",
+      salaryFrom: "Salary from",
+      salaryTo: "Salary to",
+      currency: "Currency",
+      location: "Location",
+      employmentType: "Employment type",
+    },
+    placeholders: {
+      currency: "EUR, USD...",
+    },
+    employment: {
+      notSelected: "(not selected)",
+    },
+  },
+
   errors: {
     createFailed: "Failed to create vacancy",
     loadFailed: "Failed to load vacancies (HTTP {{status}})",

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import "./CreateVacancy.css";
 
 type VacancyFormValue = {
@@ -40,6 +41,8 @@ function buildFieldErrors(errorList: unknown): FieldErrorMap {
 }
 
 export default function CreateVacancyForm({ value, onFieldChange, errorList }: Props) {
+  const { t } = useTranslation();
+
   function onInput(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
@@ -58,7 +61,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
   return (
     <div className="create-vacancy-form">
       <label className="modal-label">
-        Название (title) *
+        {t("employerProfile.vacancyForm.fields.title")} *
         <input
           className={inputClass("form-control", "title")}
           name="title"
@@ -70,7 +73,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
       </label>
 
       <label className="modal-label">
-        Описание (description) *
+        {t("employerProfile.vacancyForm.fields.description")}
         <textarea
           className={inputClass("form-control", "description")}
           name="description"
@@ -84,7 +87,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
       </label>
 
       <label className="modal-label">
-        Требования (requirements)
+        {t("employerProfile.vacancyForm.fields.requirements")}
         <textarea
           className={inputClass("form-control", "requirements")}
           name="requirements"
@@ -98,7 +101,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
       </label>
 
       <label className="modal-label">
-        Обязанности (responsibilities)
+        {t("employerProfile.vacancyForm.fields.responsibilities")}
         <textarea
           className={inputClass("form-control", "responsibilities")}
           name="responsibilities"
@@ -113,7 +116,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
 
       <div className="modal-grid-3">
         <label className="modal-label">
-          salary_from
+          {t("employerProfile.vacancyForm.fields.salaryFrom")}
           <input
             className={inputClass("form-control", "salary_from")}
             name="salary_from"
@@ -127,7 +130,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
         </label>
 
         <label className="modal-label">
-          salary_to
+          {t("employerProfile.vacancyForm.fields.salaryTo")}
           <input
             className={inputClass("form-control", "salary_to")}
             name="salary_to"
@@ -141,13 +144,13 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
         </label>
 
         <label className="modal-label">
-          currency
+          {t("employerProfile.vacancyForm.fields.currency")}
           <input
             className={inputClass("form-control", "currency")}
             name="currency"
             value={value.currency ?? ""}
             onChange={onInput}
-            placeholder="EUR, USD..."
+            placeholder={t("employerProfile.vacancyForm.placeholders.currency")}
             maxLength={10}
           />
           {hasErr("currency") && (
@@ -158,7 +161,7 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
 
       <div className="modal-grid-2">
         <label className="modal-label">
-          location
+          {t("employerProfile.vacancyForm.fields.location")}
           <input
             className={inputClass("form-control", "location")}
             name="location"
@@ -172,19 +175,19 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
         </label>
 
         <label className="modal-label">
-          employment_type
+          {t("employerProfile.vacancyForm.fields.employmentType")}
           <select
             className={inputClass("form-select", "employment_type")}
             name="employment_type"
             value={value.employment_type ?? ""}
             onChange={onInput}
           >
-            <option value="">(не выбрано)</option>
-            <option value="full_time">full_time</option>
-            <option value="part_time">part_time</option>
-            <option value="internship">internship</option>
-            <option value="contract">contract</option>
-            <option value="remote">remote</option>
+            <option value="">{t("employerProfile.vacancyForm.employment.notSelected")}</option>
+            <option value="full_time">{t("vacancies.employment.full_time")}</option>
+            <option value="part_time">{t("vacancies.employment.part_time")}</option>
+            <option value="internship">{t("vacancies.employment.internship")}</option>
+            <option value="contract">{t("vacancies.employment.contract")}</option>
+            <option value="remote">{t("vacancies.employment.remote")}</option>
           </select>
 
           {/* для select иногда надо d-block */}
