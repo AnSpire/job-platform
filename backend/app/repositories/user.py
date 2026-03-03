@@ -113,6 +113,10 @@ class UserRepository:
     async def get_by_email(self, email: str) -> User | None:
         return await self.get_raw_by_email(email)
 
+    async def list_users(self) -> list[User]:
+        result = await self.session.execute(select(User))
+        return result.scalars().all()
+
 
 
     async def update_user(self, user_id: int, data: UserUpdate) -> User:

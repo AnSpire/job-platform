@@ -86,6 +86,10 @@ class UserService:
         except NotFoundError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
+    async def list_users(self) -> list[UserRead]:
+        users = await self.user_repo.list_users()
+        return [UserRead.model_validate(user) for user in users]
+
     async def update_user(self, user_id: int, data: UserUpdate) -> UserRead:
         try:
             user = await self.user_repo.update_user(user_id, data)  # flush внутри repo
