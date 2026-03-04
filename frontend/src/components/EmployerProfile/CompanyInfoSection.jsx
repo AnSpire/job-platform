@@ -18,25 +18,64 @@ export default function CompanyInfoSection({ user }) {
   const [error, setError] = useState(null);
   const [companyId, setCompanyId] = useState(undefined);
   const [company, setCompany] = useState(null);
+  const [companies, setCompanies] = useState([]);
+  const [companiesLoading, setCompaniesLoading] = useState(false);
+  const [assigningCompanyId, setAssigningCompanyId] = useState(null);
   const [logoBroken, setLogoBroken] = useState(false);
 
   useEffect(() => {
     if (!employerId) {
       setCompanyId(undefined);
       setCompany(null);
+      setCompanies([]);
       setError(null);
       setLoading(false);
+      setCompaniesLoading(false);
+      setAssigningCompanyId(null);
       return;
     }
 
     let cancelled = false;
 
+    async function loadCompanyById(targetCompanyId) {
+      const { data: companyData } = await api.get(`/companies/${targetCompanyId}`);
+      if (!cancelled) {
+        setCompany(companyData ?? null);
+      }
+    }
+
+    async function loadAvailableCompanies() {
+      setCompaniesLoading(true);
+      try {
+        const { data: companiesData } = await api.get("/companies/");
+        if (!cancelled) {
+          setCompanies(Array.isArray(companiesData) ? companiesData : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const status = err?.response?.status ?? "?";
+          const detail = err?.response?.data?.detail;
+          setError(
+            typeof detail === "string" && detail.trim()
+              ? detail
+              : t("employerProfile.company.fetchError", { status }),
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setCompaniesLoading(false);
+        }
+      }
+    }
+
     async function loadCompanyInfo() {
       setLoading(true);
       setError(null);
       setCompany(null);
+      setCompanies([]);
       setCompanyId(undefined);
       setLogoBroken(false);
+      setAssigningCompanyId(null);
 
       try {
         const { data: employerData } = await api.get(`/employers/${employerId}`);
@@ -45,13 +84,12 @@ export default function CompanyInfoSection({ user }) {
         if (cancelled) return;
         setCompanyId(resolvedCompanyId);
 
-        if (resolvedCompanyId === null) return;
-
-        const { data: companyData } = await api.get(`/companies/${resolvedCompanyId}`);
-        if (!cancelled) {
-          setCompany(companyData ?? null);
-          console.log(companyData.logo_url);
+        if (resolvedCompanyId === null) {
+          await loadAvailableCompanies();
+          return;
         }
+
+        await loadCompanyById(resolvedCompanyId);
       } catch (err) {
         if (cancelled) return;
 
@@ -73,6 +111,36 @@ export default function CompanyInfoSection({ user }) {
       cancelled = true;
     };
   }, [employerId, t]);
+
+  async function assignCompany(selectedCompanyId) {
+    if (!employerId) return;
+
+    setAssigningCompanyId(selectedCompanyId);
+    setError(null);
+    try {
+      const { data: employerData } = await api.patch(`/employers/${employerId}/company`, {
+        company_id: selectedCompanyId,
+      });
+
+      const resolvedCompanyId = employerData?.company_id ?? selectedCompanyId;
+      setCompanyId(resolvedCompanyId);
+
+      const { data: companyData } = await api.get(`/companies/${resolvedCompanyId}`);
+      setCompany(companyData ?? null);
+      setCompanies([]);
+      setLogoBroken(false);
+    } catch (err) {
+      const status = err?.response?.status ?? "?";
+      const detail = err?.response?.data?.detail;
+      setError(
+        typeof detail === "string" && detail.trim()
+          ? detail
+          : t("employerProfile.company.fetchError", { status }),
+      );
+    } finally {
+      setAssigningCompanyId(null);
+    }
+  }
 
   const companyInitials = useMemo(() => getInitials(company?.name), [company?.name]);
 
@@ -96,7 +164,36 @@ export default function CompanyInfoSection({ user }) {
       )}
 
       {employerId && !loading && !error && companyId === null && (
-        <p className="employer-company-card__state">{t("employerProfile.company.notAssigned")}</p>
+        <>
+          <p className="employer-company-card__state">{t("employerProfile.company.notAssigned")}</p>
+
+          {companiesLoading && (
+            <p className="employer-company-card__state">Загрузка списка компаний...</p>
+          )}
+
+          {!companiesLoading && companies.length > 0 && (
+            <div className="employer-company-card__company-list">
+              {companies.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className="employer-company-card__company-option"
+                  disabled={assigningCompanyId !== null}
+                  onClick={() => assignCompany(item.id)}
+                >
+                  <span className="employer-company-card__company-option-name">{item.name}</span>
+                  <span className="employer-company-card__company-option-meta">
+                    {item.industry || "Unknown industry"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!companiesLoading && companies.length === 0 && (
+            <p className="employer-company-card__state">Доступные компании не найдены.</p>
+          )}
+        </>
       )}
 
       {employerId && !loading && !error && companyId !== null && company && (

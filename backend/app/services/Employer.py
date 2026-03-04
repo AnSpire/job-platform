@@ -3,7 +3,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
-from app.dto.Employer import EmployerCreate, EmployerRead, EmployerUpdate
+from app.dto.Employer import EmployerCompanyAssign, EmployerCreate, EmployerRead, EmployerUpdate
 from app.repositories.Employer import EmployerRepository
 from app.repositories.Exceptions import (
     NotFoundError,
@@ -80,3 +80,19 @@ class EmployerService:
         except NotFoundError as e:
             await self.session.rollback()
             raise HTTPException(status_code=404, detail=str(e))
+
+    async def assign_company(self, employer_id: int, data: EmployerCompanyAssign) -> EmployerRead:
+        try:
+            employer = await self.repo.update_company(employer_id=employer_id, company_id=data.company_id)
+            await self.session.commit()
+            await self.session.refresh(employer)
+            return self.repo.to_read(employer)
+        except NotFoundError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=404, detail=str(e))
+        except ForeignKeyError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=400, detail=str(e))
+        except ConstraintError as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=400, detail=str(e))

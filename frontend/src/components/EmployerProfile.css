@@ -144,6 +144,45 @@
   font-size: 0.88rem;
 }
 
+.employer-company-card__company-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.employer-company-card__company-option {
+  text-align: left;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 3px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.employer-company-card__company-option:hover:enabled {
+  border-color: #60a5fa;
+  background: #f8fbff;
+}
+
+.employer-company-card__company-option:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.employer-company-card__company-option-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.employer-company-card__company-option-meta {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
 .employer-vacancies-card {
   background:
     radial-gradient(circle at 0% 0%, rgba(191, 219, 254, 0.4), transparent 45%),

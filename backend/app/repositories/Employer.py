@@ -100,6 +100,17 @@ class EmployerRepository:
 
         return employer
 
+    async def update_company(self, employer_id: int, company_id: int | None) -> Employer:
+        employer = await self.get_by_id(employer_id)
+        employer.company_id = company_id
+
+        try:
+            await self.session.flush()
+        except IntegrityError as e:
+            raise _classify_integrity_error(e) from e
+
+        return employer
+
     # ---------- delete ----------
     async def delete(self, employer_id: int) -> None:
         employer = await self.get_by_id(employer_id)

@@ -21,3 +21,7 @@ class EmployerRead(BaseModel):
 class EmployerUpdate(BaseModel):
     company_id: int | None = None
     position: Annotated[str, StringConstraints(min_length=1, max_length=100)] | None = None
+
+
+class EmployerCompanyAssign(BaseModel):
+    company_id: int | None
