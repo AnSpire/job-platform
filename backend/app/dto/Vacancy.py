@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Annotated
-
+from enum import Enum
 from pydantic import BaseModel, StringConstraints, ConfigDict
 
 
 Title = Annotated[str, StringConstraints(min_length=1, max_length=120)]
 ShortStr30 = Annotated[str, StringConstraints(min_length=1, max_length=30)]
 ShortStr100 = Annotated[str, StringConstraints(min_length=1, max_length=100)]
-Currency = Annotated[str, StringConstraints(min_length=1, max_length=10)]
+class Currency(str, Enum):
+    RUB = "RUB"
+    USD = "USD"
+    EUR = "EUR"
 
 
 class VacancyCreate(BaseModel):

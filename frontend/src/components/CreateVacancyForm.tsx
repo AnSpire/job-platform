@@ -145,16 +145,18 @@ export default function CreateVacancyForm({ value, onFieldChange, errorList }: P
 
         <label className="modal-label">
           {t("employerProfile.vacancyForm.fields.currency")}
-          <input
-            className={inputClass("form-control", "currency")}
+          <select
+            className={inputClass("form-select", "currency")}
             name="currency"
             value={value.currency ?? ""}
             onChange={onInput}
-            placeholder={t("employerProfile.vacancyForm.placeholders.currency")}
-            maxLength={10}
-          />
+          >
+            <option value="RUB">RUB</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
           {hasErr("currency") && (
-            <div className="invalid-feedback">{errText("currency")}</div>
+            <div className="invalid-feedback d-block">{errText("currency")}</div>
           )}
         </label>
       </div>
