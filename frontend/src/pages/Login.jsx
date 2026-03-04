@@ -34,7 +34,7 @@ function parseLoginErrors(error, fallback) {
   }
 
   if (Object.keys(fieldErrors).length > 0) {
-    if (typeof data?.detail === "string" && data.detail !== "Validation error") {
+    if (typeof data?.detail === "string" && !["ошибка валидации", "validation error", "error de validación"].includes(data.detail.toLowerCase())) {
       return { generalError: data.detail, fieldErrors };
     }
     return { generalError: null, fieldErrors };

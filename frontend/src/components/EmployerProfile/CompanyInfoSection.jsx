@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api.js";
 
@@ -23,6 +23,24 @@ export default function CompanyInfoSection({ user }) {
   const [assigningCompanyId, setAssigningCompanyId] = useState(null);
   const [logoBroken, setLogoBroken] = useState(false);
 
+  const loadAvailableCompanies = useCallback(async () => {
+    setCompaniesLoading(true);
+    try {
+      const { data: companiesData } = await api.get("/companies/");
+      setCompanies(Array.isArray(companiesData) ? companiesData : []);
+    } catch (err) {
+      const status = err?.response?.status ?? "?";
+      const detail = err?.response?.data?.detail;
+      setError(
+        typeof detail === "string" && detail.trim()
+          ? detail
+          : t("employerProfile.company.fetchError", { status }),
+      );
+    } finally {
+      setCompaniesLoading(false);
+    }
+  }, [t]);
+
   useEffect(() => {
     if (!employerId) {
       setCompanyId(undefined);
@@ -41,30 +59,6 @@ export default function CompanyInfoSection({ user }) {
       const { data: companyData } = await api.get(`/companies/${targetCompanyId}`);
       if (!cancelled) {
         setCompany(companyData ?? null);
-      }
-    }
-
-    async function loadAvailableCompanies() {
-      setCompaniesLoading(true);
-      try {
-        const { data: companiesData } = await api.get("/companies/");
-        if (!cancelled) {
-          setCompanies(Array.isArray(companiesData) ? companiesData : []);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          const status = err?.response?.status ?? "?";
-          const detail = err?.response?.data?.detail;
-          setError(
-            typeof detail === "string" && detail.trim()
-              ? detail
-              : t("employerProfile.company.fetchError", { status }),
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setCompaniesLoading(false);
-        }
       }
     }
 
@@ -110,25 +104,31 @@ export default function CompanyInfoSection({ user }) {
     return () => {
       cancelled = true;
     };
-  }, [employerId, t]);
+  }, [employerId, t, loadAvailableCompanies]);
 
   async function assignCompany(selectedCompanyId) {
     if (!employerId) return;
 
-    setAssigningCompanyId(selectedCompanyId);
+    setAssigningCompanyId(selectedCompanyId ?? "detach");
     setError(null);
     try {
       const { data: employerData } = await api.patch(`/employers/${employerId}/company`, {
         company_id: selectedCompanyId,
       });
 
-      const resolvedCompanyId = employerData?.company_id ?? selectedCompanyId;
+      const resolvedCompanyId = employerData?.company_id ?? selectedCompanyId ?? null;
       setCompanyId(resolvedCompanyId);
+
+      setLogoBroken(false);
+      if (resolvedCompanyId === null) {
+        setCompany(null);
+        await loadAvailableCompanies();
+        return;
+      }
 
       const { data: companyData } = await api.get(`/companies/${resolvedCompanyId}`);
       setCompany(companyData ?? null);
       setCompanies([]);
-      setLogoBroken(false);
     } catch (err) {
       const status = err?.response?.status ?? "?";
       const detail = err?.response?.data?.detail;
@@ -148,7 +148,6 @@ export default function CompanyInfoSection({ user }) {
     <section className="employer-company-card">
       <div className="employer-company-card__head">
         <h3>{t("employerProfile.company.title")}</h3>
-        <span>{t("employerProfile.company.liveBadge")}</span>
       </div>
 
       {!employerId && (
@@ -249,6 +248,17 @@ export default function CompanyInfoSection({ user }) {
           <p className="employer-company-card__about">
             {t("employerProfile.company.about")}: {company.description || t("employerProfile.company.descriptionUnavailable")}
           </p>
+
+          <div className="employer-company-card__actions">
+            <button
+              type="button"
+              className="employer-company-card__leave-btn"
+              disabled={assigningCompanyId !== null}
+              onClick={() => assignCompany(null)}
+            >
+              Уйти из компании
+            </button>
+          </div>
         </>
       )}
     </section>

@@ -2,6 +2,8 @@
   /* display: flex;
   justify-content: left; */
   padding-top: 20px;
+  min-height: 100vh;
+  padding-bottom: 1rem;
 }
 
 .profile-card {
