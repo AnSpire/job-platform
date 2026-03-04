@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.Employer import Employer
     from app.models.Application import Application
     from app.models.VacancyTranslation import VacancyTranslation
+    from app.models.SavedVacancy import SavedVacancy
 
 
 class Vacancy(DCBase):
@@ -69,6 +70,14 @@ class Vacancy(DCBase):
     # внутри Vacancy:
     translations: Mapped[list["VacancyTranslation"]] = relationship(
         "VacancyTranslation",
+        back_populates="vacancy",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
+    )
+
+    saved_by_users: Mapped[list["SavedVacancy"]] = relationship(
+        "SavedVacancy",
         back_populates="vacancy",
         cascade="all, delete-orphan",
         init=False,

@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from app.models.Employer import Employer
     from app.models.Student import Student
     from app.models.Resume import Resume
+    from app.models.SavedVacancy import SavedVacancy
+    from app.models.Notification import Notification
 
 
 class User(DCBase):
@@ -61,6 +63,22 @@ class User(DCBase):
         back_populates="user",
         cascade="all, delete-orphan",
         init=False,
+    )
+
+    saved_vacancies: Mapped[list["SavedVacancy"]] = relationship(
+        "SavedVacancy",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
+    )
+
+    notifications: Mapped[list["Notification"]] = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
     )
 
     def __str__(self) -> str:

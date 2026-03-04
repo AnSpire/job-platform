@@ -13,6 +13,7 @@ from app.models.Base import DCBase
 if TYPE_CHECKING:
     from app.models.Resume import Resume
     from app.models.Vacancy import Vacancy
+    from app.models.Interview import Interview
 
 
 class ApplicationStatus(enum.Enum):
@@ -67,6 +68,14 @@ class Application(DCBase):
         "Vacancy",
         back_populates="applications",
         init=False,
+    )
+
+    interviews: Mapped[list["Interview"]] = relationship(
+        "Interview",
+        back_populates="application",
+        cascade="all, delete-orphan",
+        init=False,
+        passive_deletes=True,
     )
 
     __table_args__ = (

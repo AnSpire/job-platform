@@ -8,6 +8,9 @@ from .Resume import Resume
 from .Vacancy import Vacancy
 from .VacancyTranslation import VacancyTranslation
 from .Application import Application
+from .SavedVacancy import SavedVacancy
+from .Interview import Interview
+from .Notification import Notification
 
 __all__ = [
     "Base",
@@ -20,4 +23,7 @@ __all__ = [
     "VacancyTranslation",
     "Vacancy",
     "Application",
+    "SavedVacancy",
+    "Interview",
+    "Notification",
 ]

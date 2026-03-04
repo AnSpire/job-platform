@@ -14,6 +14,9 @@ from app.models.Resume import Resume
 from app.models.Vacancy import Vacancy
 from app.models.Student import Student
 from app.models.VacancyTranslation import VacancyTranslation
+from app.models.SavedVacancy import SavedVacancy
+from app.models.Interview import Interview
+from app.models.Notification import Notification
 
 # --------------------------------------------
 # 1. Загружаем переменные окружения
